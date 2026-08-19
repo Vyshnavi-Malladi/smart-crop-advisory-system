@@ -757,19 +757,283 @@
 
 
 
+# import os
+# import io
+# import torch
+# import torch.nn as nn
+# from torchvision import transforms, models
+# from ultralytics import YOLO
+# from fastapi import FastAPI, File, UploadFile, HTTPException, Body
+# from fastapi.middleware.cors import CORSMiddleware
+# from PIL import Image
+# import numpy as np
+# import joblib
+
+# app = FastAPI(title="Smart Crop Advisory ML Service")
+
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=["*"],
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
+
+# models_loaded = {}
+# MODELS_DIR = 'models'
+
+
+# # =============================
+# # LOAD MODELS
+# # =============================
+# def load_models():
+#     print("Loading models...")
+
+#     # Crop Recommendation
+#     try:
+#         models_loaded['crop_rec'] = joblib.load(
+#             os.path.join(MODELS_DIR, 'crop_recommendation_model.pkl')
+#         )
+#         print("Crop Recommendation model loaded.")
+#     except Exception as e:
+#         print(f"Error loading Crop Rec model: {e}")
+
+#     # Yield Model
+#     try:
+#         models_loaded['yield_model'] = joblib.load(
+#             os.path.join(MODELS_DIR, 'yield_model.pkl')
+#         )
+#         models_loaded['yield_le'] = joblib.load(
+#             os.path.join(MODELS_DIR, 'yield_label_encoder.pkl')
+#         )
+#         print("Yield Prediction model loaded.")
+#     except Exception as e:
+#         print(f"Error loading Yield model: {e}")
+
+#     # YOLO Model
+#     try:
+#         yolo_path = os.path.join(MODELS_DIR, 'yolov11_inspired_detector.pt')
+#         if os.path.exists(yolo_path):
+#             models_loaded['yolo'] = YOLO(yolo_path)
+#             models_loaded['yolo_classes'] = models_loaded['yolo'].names
+#             print("YOLO model loaded.")
+#     except Exception as e:
+#         print(f"Error loading YOLO model: {e}")
+
+#     # CNN Disease Model
+#     try:
+#         cnn_path = os.path.join(MODELS_DIR, 'cnn_resnet18_final.pth')
+#         if os.path.exists(cnn_path):
+#             checkpoint = torch.load(cnn_path, map_location='cpu')
+
+#             cnn_model = models.resnet18(weights=None)
+#             num_features = cnn_model.fc.in_features
+
+#             class_names = checkpoint.get('class_names', [])
+
+#             cnn_model.fc = nn.Sequential(
+#                 nn.Linear(num_features, 512),
+#                 nn.ReLU(),
+#                 nn.Dropout(0.3),
+#                 nn.Linear(512, len(class_names))
+#             )
+
+#             cnn_model.load_state_dict(checkpoint.get('model_state_dict', {}))
+#             cnn_model.eval()
+
+#             models_loaded['cnn'] = cnn_model
+#             models_loaded['cnn_classes'] = class_names
+
+#             print("CNN model loaded.")
+#             print("Classes:", class_names)
+
+#     except Exception as e:
+#         print(f"Error loading CNN model: {e}")
+
+
+# @app.on_event("startup")
+# async def startup_event():
+#     load_models()
+
+
+# @app.get("/health")
+# def health():
+#     return {"status": "running", "models": list(models_loaded.keys())}
+
+
+# # =============================
+# # CROP RECOMMENDATION (TOP 3)
+# # =============================
+# @app.post("/recommend_crop")
+# async def recommend_crop(data: dict = Body(...)):
+#     if 'crop_rec' not in models_loaded:
+#         raise HTTPException(status_code=503, detail="Model not loaded")
+
+#     try:
+#         model = models_loaded['crop_rec']
+
+#         features = np.array([[ 
+#             float(data.get('N')),
+#             float(data.get('P')),
+#             float(data.get('K')),
+#             float(data.get('temperature')),
+#             float(data.get('humidity')),
+#             float(data.get('ph')),
+#             float(data.get('rainfall'))
+#         ]])
+
+#         probabilities = model.predict_proba(features)[0]
+#         classes = model.classes_
+
+#         top3_indices = np.argsort(probabilities)[-3:][::-1]
+
+#         top3 = []
+#         for idx in top3_indices:
+#             top3.append({
+#                 "crop": classes[idx],
+#                 "confidence": round(float(probabilities[idx] * 100), 2)
+#             })
+
+#         return {
+#             "top_3_recommendations": top3
+#         }
+
+#     except Exception as e:
+#         print("Crop Recommendation Error:", e)
+#         raise HTTPException(status_code=500, detail=str(e))
+
+
+# # =============================
+# # YIELD PREDICTION
+# # =============================
+# @app.post("/predict_yield")
+# async def predict_yield(data: dict = Body(...)):
+#     try:
+#         crop_id = data.get('crop').lower()
+#         area_acres = float(data.get('area'))
+
+#         model = models_loaded.get('yield_model')
+#         le = models_loaded.get('yield_le')
+
+#         if model is None or le is None:
+#             raise HTTPException(status_code=503, detail="Yield model not loaded")
+
+#         classes = le.classes_
+#         if crop_id.capitalize() not in classes:
+#             return {
+#                 "crop": crop_id,
+#                 "predicted_yield": 2.0 * area_acres,
+#                 "unit": "tons",
+#                 "method": "fallback"
+#             }
+
+#         crop_encoded = le.transform([crop_id.capitalize()])
+#         features = [[crop_encoded[0]]]
+#         pred_hg_ha = model.predict(features)[0]
+
+#         yield_tons_per_ha = pred_hg_ha / 10000.0
+#         predicted_yield_tons = yield_tons_per_ha * (area_acres * 0.404686)
+
+#         return {
+#             "crop": crop_id,
+#             "area": area_acres,
+#             "predicted_yield": round(predicted_yield_tons, 2),
+#             "unit": "tons",
+#             "method": "ml"
+#         }
+
+#     except Exception as e:
+#         print("Yield Prediction Error:", e)
+#         raise HTTPException(status_code=500, detail=str(e))
+
+
+# # =============================
+# # DISEASE PREDICTION (FIXED)
+# # =============================
+# def preprocess_image(image_bytes):
+#     transform = transforms.Compose([
+#         transforms.Resize((224, 224)),
+#         transforms.ToTensor(),
+#         transforms.Normalize([0.485, 0.456, 0.406],
+#                              [0.229, 0.224, 0.225])
+#     ])
+#     image = Image.open(io.BytesIO(image_bytes)).convert('RGB')
+#     return transform(image).unsqueeze(0)
+
+
+# @app.post("/predict_disease")
+# async def predict_disease(file: UploadFile = File(...)):
+#     if 'cnn' not in models_loaded:
+#         raise HTTPException(status_code=503, detail="Disease model not loaded")
+
+#     try:
+#         image_bytes = await file.read()
+#         tensor = preprocess_image(image_bytes)
+
+#         with torch.no_grad():
+#             outputs = models_loaded['cnn'](tensor)
+#             probs = torch.nn.functional.softmax(outputs[0], dim=0)
+
+#             conf, pred_idx = torch.max(probs, 0)
+
+#         confidence_percent = round(float(conf) * 100, 2)
+#         class_name = models_loaded['cnn_classes'][pred_idx.item()]
+
+#         # DEBUG PRINTS
+#         print("All probabilities:", probs)
+#         print("Predicted class:", class_name)
+#         print("Confidence %:", confidence_percent)
+
+#         # Safety fallback if model unsure
+#         if confidence_percent < 50:
+#             return {
+#                 "disease": "Uncertain - Please consult expert",
+#                 "confidence": confidence_percent
+#             }
+
+#         return {
+#             "disease": class_name,
+#             "confidence": confidence_percent
+#         }
+
+#     except Exception as e:
+#         print("Disease Prediction Error:", e)
+#         raise HTTPException(status_code=500, detail=str(e))
+
+
+# if __name__ == "__main__":
+#     import uvicorn
+#     uvicorn.run(app, host="0.0.0.0", port=8001)
+
+
+
+
+
+
+
+
+
+
+
+
+
 import os
 import io
+
 import torch
 import torch.nn as nn
 from torchvision import transforms, models
-from ultralytics import YOLO
+
 from fastapi import FastAPI, File, UploadFile, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
+
 from PIL import Image
 import numpy as np
 import joblib
 
+
 app = FastAPI(title="Smart Crop Advisory ML Service")
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -779,119 +1043,132 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 models_loaded = {}
-MODELS_DIR = 'models'
+
+MODELS_DIR = "models"
 
 
 # =============================
 # LOAD MODELS
 # =============================
 def load_models():
-    print("Loading models...")
+    print("Loading lightweight models...")
 
-    # Crop Recommendation
+    # =============================
+    # CROP RECOMMENDATION
+    # =============================
     try:
-        models_loaded['crop_rec'] = joblib.load(
-            os.path.join(MODELS_DIR, 'crop_recommendation_model.pkl')
+        models_loaded["crop_rec"] = joblib.load(
+            os.path.join(
+                MODELS_DIR,
+                "crop_recommendation_model.pkl"
+            )
         )
+
         print("Crop Recommendation model loaded.")
+
     except Exception as e:
         print(f"Error loading Crop Rec model: {e}")
 
-    # Yield Model
+
+    # =============================
+    # YIELD MODEL
+    # =============================
     try:
-        models_loaded['yield_model'] = joblib.load(
-            os.path.join(MODELS_DIR, 'yield_model.pkl')
+        models_loaded["yield_model"] = joblib.load(
+            os.path.join(
+                MODELS_DIR,
+                "yield_model.pkl"
+            )
         )
-        models_loaded['yield_le'] = joblib.load(
-            os.path.join(MODELS_DIR, 'yield_label_encoder.pkl')
+
+        models_loaded["yield_le"] = joblib.load(
+            os.path.join(
+                MODELS_DIR,
+                "yield_label_encoder.pkl"
+            )
         )
+
         print("Yield Prediction model loaded.")
+
     except Exception as e:
         print(f"Error loading Yield model: {e}")
 
-    # YOLO Model
-    try:
-        yolo_path = os.path.join(MODELS_DIR, 'yolov11_inspired_detector.pt')
-        if os.path.exists(yolo_path):
-            models_loaded['yolo'] = YOLO(yolo_path)
-            models_loaded['yolo_classes'] = models_loaded['yolo'].names
-            print("YOLO model loaded.")
-    except Exception as e:
-        print(f"Error loading YOLO model: {e}")
 
-    # CNN Disease Model
-    try:
-        cnn_path = os.path.join(MODELS_DIR, 'cnn_resnet18_final.pth')
-        if os.path.exists(cnn_path):
-            checkpoint = torch.load(cnn_path, map_location='cpu')
-
-            cnn_model = models.resnet18(weights=None)
-            num_features = cnn_model.fc.in_features
-
-            class_names = checkpoint.get('class_names', [])
-
-            cnn_model.fc = nn.Sequential(
-                nn.Linear(num_features, 512),
-                nn.ReLU(),
-                nn.Dropout(0.3),
-                nn.Linear(512, len(class_names))
-            )
-
-            cnn_model.load_state_dict(checkpoint.get('model_state_dict', {}))
-            cnn_model.eval()
-
-            models_loaded['cnn'] = cnn_model
-            models_loaded['cnn_classes'] = class_names
-
-            print("CNN model loaded.")
-            print("Classes:", class_names)
-
-    except Exception as e:
-        print(f"Error loading CNN model: {e}")
-
-
+# =============================
+# STARTUP
+# =============================
 @app.on_event("startup")
 async def startup_event():
+
     load_models()
 
+    print("ML service started successfully.")
 
-@app.get("/health")
-def health():
-    return {"status": "running", "models": list(models_loaded.keys())}
+    print(
+        "Loaded models:",
+        list(models_loaded.keys())
+    )
 
 
 # =============================
-# CROP RECOMMENDATION (TOP 3)
+# HEALTH
+# =============================
+@app.get("/health")
+def health():
+
+    return {
+        "status": "running",
+        "models": list(models_loaded.keys())
+    }
+
+
+# =============================
+# CROP RECOMMENDATION
 # =============================
 @app.post("/recommend_crop")
 async def recommend_crop(data: dict = Body(...)):
-    if 'crop_rec' not in models_loaded:
-        raise HTTPException(status_code=503, detail="Model not loaded")
+
+    if "crop_rec" not in models_loaded:
+
+        raise HTTPException(
+            status_code=503,
+            detail="Crop recommendation model not loaded"
+        )
 
     try:
-        model = models_loaded['crop_rec']
 
-        features = np.array([[ 
-            float(data.get('N')),
-            float(data.get('P')),
-            float(data.get('K')),
-            float(data.get('temperature')),
-            float(data.get('humidity')),
-            float(data.get('ph')),
-            float(data.get('rainfall'))
+        model = models_loaded["crop_rec"]
+
+        features = np.array([[
+            float(data.get("N")),
+            float(data.get("P")),
+            float(data.get("K")),
+            float(data.get("temperature")),
+            float(data.get("humidity")),
+            float(data.get("ph")),
+            float(data.get("rainfall"))
         ]])
 
         probabilities = model.predict_proba(features)[0]
+
         classes = model.classes_
 
-        top3_indices = np.argsort(probabilities)[-3:][::-1]
+        top3_indices = np.argsort(
+            probabilities
+        )[-3:][::-1]
 
         top3 = []
+
         for idx in top3_indices:
+
             top3.append({
                 "crop": classes[idx],
-                "confidence": round(float(probabilities[idx] * 100), 2)
+                "confidence": round(
+                    float(probabilities[idx] * 100),
+                    2
+                )
             })
 
         return {
@@ -899,8 +1176,16 @@ async def recommend_crop(data: dict = Body(...)):
         }
 
     except Exception as e:
-        print("Crop Recommendation Error:", e)
-        raise HTTPException(status_code=500, detail=str(e))
+
+        print(
+            "Crop Recommendation Error:",
+            e
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
 
 
 # =============================
@@ -908,18 +1193,34 @@ async def recommend_crop(data: dict = Body(...)):
 # =============================
 @app.post("/predict_yield")
 async def predict_yield(data: dict = Body(...)):
-    try:
-        crop_id = data.get('crop').lower()
-        area_acres = float(data.get('area'))
 
-        model = models_loaded.get('yield_model')
-        le = models_loaded.get('yield_le')
+    try:
+
+        crop_id = data.get("crop").lower()
+
+        area_acres = float(
+            data.get("area")
+        )
+
+        model = models_loaded.get(
+            "yield_model"
+        )
+
+        le = models_loaded.get(
+            "yield_le"
+        )
 
         if model is None or le is None:
-            raise HTTPException(status_code=503, detail="Yield model not loaded")
+
+            raise HTTPException(
+                status_code=503,
+                detail="Yield model not loaded"
+            )
 
         classes = le.classes_
+
         if crop_id.capitalize() not in classes:
+
             return {
                 "crop": crop_id,
                 "predicted_yield": 2.0 * area_acres,
@@ -927,80 +1228,300 @@ async def predict_yield(data: dict = Body(...)):
                 "method": "fallback"
             }
 
-        crop_encoded = le.transform([crop_id.capitalize()])
-        features = [[crop_encoded[0]]]
-        pred_hg_ha = model.predict(features)[0]
+        crop_encoded = le.transform([
+            crop_id.capitalize()
+        ])
 
-        yield_tons_per_ha = pred_hg_ha / 10000.0
-        predicted_yield_tons = yield_tons_per_ha * (area_acres * 0.404686)
+        features = [
+            [crop_encoded[0]]
+        ]
+
+        pred_hg_ha = model.predict(
+            features
+        )[0]
+
+        yield_tons_per_ha = (
+            pred_hg_ha / 10000.0
+        )
+
+        predicted_yield_tons = (
+            yield_tons_per_ha
+            * (area_acres * 0.404686)
+        )
 
         return {
             "crop": crop_id,
             "area": area_acres,
-            "predicted_yield": round(predicted_yield_tons, 2),
+            "predicted_yield": round(
+                predicted_yield_tons,
+                2
+            ),
             "unit": "tons",
             "method": "ml"
         }
 
     except Exception as e:
-        print("Yield Prediction Error:", e)
-        raise HTTPException(status_code=500, detail=str(e))
+
+        print(
+            "Yield Prediction Error:",
+            e
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
 
 
 # =============================
-# DISEASE PREDICTION (FIXED)
+# DISEASE IMAGE PREPROCESSING
 # =============================
 def preprocess_image(image_bytes):
+
     transform = transforms.Compose([
-        transforms.Resize((224, 224)),
+
+        transforms.Resize(
+            (224, 224)
+        ),
+
         transforms.ToTensor(),
-        transforms.Normalize([0.485, 0.456, 0.406],
-                             [0.229, 0.224, 0.225])
+
+        transforms.Normalize(
+            [0.485, 0.456, 0.406],
+            [0.229, 0.224, 0.225]
+        )
     ])
-    image = Image.open(io.BytesIO(image_bytes)).convert('RGB')
+
+    image = Image.open(
+        io.BytesIO(image_bytes)
+    ).convert("RGB")
+
     return transform(image).unsqueeze(0)
 
 
-@app.post("/predict_disease")
-async def predict_disease(file: UploadFile = File(...)):
-    if 'cnn' not in models_loaded:
-        raise HTTPException(status_code=503, detail="Disease model not loaded")
+# =============================
+# LOAD CNN ONLY WHEN NEEDED
+# =============================
+def load_cnn_model():
+
+    if "cnn" in models_loaded:
+
+        return (
+            models_loaded["cnn"],
+            models_loaded["cnn_classes"]
+        )
+
+    cnn_path = os.path.join(
+        MODELS_DIR,
+        "cnn_resnet18_final.pth"
+    )
+
+    if not os.path.exists(cnn_path):
+
+        raise HTTPException(
+            status_code=503,
+            detail="Disease model file not found"
+        )
 
     try:
+
+        print(
+            "Loading CNN disease model..."
+        )
+
+        checkpoint = torch.load(
+            cnn_path,
+            map_location="cpu"
+        )
+
+        cnn_model = models.resnet18(
+            weights=None
+        )
+
+        num_features = (
+            cnn_model.fc.in_features
+        )
+
+        class_names = checkpoint.get(
+            "class_names",
+            []
+        )
+
+        if not class_names:
+
+            raise Exception(
+                "CNN class names not found"
+            )
+
+        cnn_model.fc = nn.Sequential(
+
+            nn.Linear(
+                num_features,
+                512
+            ),
+
+            nn.ReLU(),
+
+            nn.Dropout(
+                0.3
+            ),
+
+            nn.Linear(
+                512,
+                len(class_names)
+            )
+        )
+
+        cnn_model.load_state_dict(
+            checkpoint[
+                "model_state_dict"
+            ]
+        )
+
+        cnn_model.eval()
+
+        models_loaded["cnn"] = cnn_model
+
+        models_loaded[
+            "cnn_classes"
+        ] = class_names
+
+        print(
+            "CNN disease model loaded."
+        )
+
+        print(
+            "Classes:",
+            class_names
+        )
+
+        return (
+            cnn_model,
+            class_names
+        )
+
+    except Exception as e:
+
+        print(
+            "CNN Loading Error:",
+            e
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
+
+
+# =============================
+# DISEASE PREDICTION
+# =============================
+@app.post("/predict_disease")
+async def predict_disease(
+    file: UploadFile = File(...)
+):
+
+    try:
+
+        # Load CNN only when
+        # disease prediction is requested
+
+        cnn_model, class_names = (
+            load_cnn_model()
+        )
+
         image_bytes = await file.read()
-        tensor = preprocess_image(image_bytes)
+
+        tensor = preprocess_image(
+            image_bytes
+        )
 
         with torch.no_grad():
-            outputs = models_loaded['cnn'](tensor)
-            probs = torch.nn.functional.softmax(outputs[0], dim=0)
 
-            conf, pred_idx = torch.max(probs, 0)
+            outputs = cnn_model(
+                tensor
+            )
 
-        confidence_percent = round(float(conf) * 100, 2)
-        class_name = models_loaded['cnn_classes'][pred_idx.item()]
+            probs = torch.nn.functional.softmax(
+                outputs[0],
+                dim=0
+            )
 
-        # DEBUG PRINTS
-        print("All probabilities:", probs)
-        print("Predicted class:", class_name)
-        print("Confidence %:", confidence_percent)
+            conf, pred_idx = torch.max(
+                probs,
+                0
+            )
 
-        # Safety fallback if model unsure
+        confidence_percent = round(
+            float(conf) * 100,
+            2
+        )
+
+        class_name = class_names[
+            pred_idx.item()
+        ]
+
+        print(
+            "Predicted class:",
+            class_name
+        )
+
+        print(
+            "Confidence:",
+            confidence_percent
+        )
+
         if confidence_percent < 50:
+
             return {
-                "disease": "Uncertain - Please consult expert",
-                "confidence": confidence_percent
+                "disease":
+                    "Uncertain - Please consult expert",
+
+                "confidence":
+                    confidence_percent
             }
 
         return {
-            "disease": class_name,
-            "confidence": confidence_percent
+            "disease":
+                class_name,
+
+            "confidence":
+                confidence_percent
         }
 
+    except HTTPException:
+
+        raise
+
     except Exception as e:
-        print("Disease Prediction Error:", e)
-        raise HTTPException(status_code=500, detail=str(e))
+
+        print(
+            "Disease Prediction Error:",
+            e
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
 
 
+# =============================
+# RUN SERVER
+# =============================
 if __name__ == "__main__":
+
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+
+    port = int(
+        os.environ.get(
+            "PORT",
+            8001
+        )
+    )
+
+    uvicorn.run(
+        app,
+        host="0.0.0.0",
+        port=port
+    )
