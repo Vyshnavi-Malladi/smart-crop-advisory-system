@@ -403,7 +403,7 @@ import {
     Sprout,
     ClipboardList
 } from 'lucide-react';
-import axios from 'axios';
+
 import api from '../api';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
@@ -436,15 +436,15 @@ export default function DiseaseDetect() {
 
         try {
             // DO NOT CHANGE - ML API
-            const { data } = await axios.post(
-                'http://localhost:8001/predict_disease',
-                formData,
-                {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                }
-            );
+          const { data } = await api.post(
+    '/ml/disease',
+    formData,
+    {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    }
+);
 
             setTimeout(() => {
                 setResult(data);
