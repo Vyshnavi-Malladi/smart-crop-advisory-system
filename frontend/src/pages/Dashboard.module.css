@@ -1,0 +1,2166 @@
+/* =========================================================
+   FARMXPERT DASHBOARD MODULE CSS
+   ========================================================= */
+
+/* =========================================================
+   MAIN DASHBOARD
+   ========================================================= */
+
+.dashboard {
+  width: 100%;
+  min-height: calc(100vh - 80px);
+  padding: 14px 28px 24px 34px;
+  background: #ffffff;
+  color: #111827;
+  font-family:
+    Inter,
+    "Segoe UI",
+    Arial,
+    sans-serif;
+  box-sizing: border-box;
+}
+
+.dashboard *,
+.dashboard *::before,
+.dashboard *::after {
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   WELCOME BANNER
+   ========================================================= */
+
+.welcome {
+  position: relative;
+  width: 100%;
+  height: 92px;
+  margin: 0 0 8px;
+  overflow: hidden;
+  border-radius: 0;
+  background: #ffffff;
+  isolation: isolate;
+}
+
+.welcomeImage {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 61%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  z-index: 1;
+  pointer-events: none;
+  user-select: none;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.2) 8%,
+    #000 24%,
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.2) 8%,
+    #000 24%,
+    #000 100%
+  );
+  animation: farmBannerFloat 8s ease-in-out infinite;
+}
+
+.welcomeOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    #ffffff 0%,
+    #ffffff 29%,
+    rgba(255, 255, 255, 0.96) 36%,
+    rgba(255, 255, 255, 0.35) 51%,
+    rgba(255, 255, 255, 0) 69%
+  );
+}
+
+.welcomeContent {
+  position: relative;
+  z-index: 5;
+  width: 50%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 0 0 2px;
+}
+
+.welcomeTitle {
+  margin: 0;
+  color: #111827;
+  font-size: 25px;
+  line-height: 30px;
+  font-weight: 750;
+  letter-spacing: -0.6px;
+  white-space: nowrap;
+}
+
+.welcomeTitle .name {
+  color: #08752f;
+  font-weight: 760;
+}
+
+.welcomeTitle .plant {
+  display: inline-block;
+  margin-left: 7px;
+  font-size: 20px;
+  transform-origin: bottom center;
+  animation: farmPlantWave 3s ease-in-out infinite;
+}
+
+.welcomeSubtitle {
+  margin: 4px 0 0;
+  color: #46534b;
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 400;
+  max-width: 430px;
+}
+
+@keyframes farmBannerFloat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.015);
+  }
+}
+
+@keyframes farmPlantWave {
+  0%,
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(7deg) scale(1.08);
+  }
+}
+
+/* =========================================================
+   WEATHER
+   ========================================================= */
+
+.weatherOuter {
+  position: relative;
+  width: 100%;
+  height: 117px;
+  margin: 0 0 14px;
+
+  display: flex;
+  align-items: stretch;
+  gap: 14px;
+
+  overflow: hidden;
+
+  border-radius: 15px;
+  /* border: 1px solid #e8eeea; */
+
+  /* background: #ffffff; */
+
+  /* box-shadow: 0 3px 12px rgba(20, 70, 37, 0.035); */
+}
+
+.weatherCard {
+  position: relative;
+  z-index: 3;
+  width: 59%;
+  height: 116px;
+  padding: 12px 18px;
+  border-radius: 15px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #075e2d 0%, #087d3a 55%, #128d46 100%);
+  box-shadow: 0 7px 18px rgba(0, 99, 42, 0.16);
+}
+
+.weatherHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 20px;
+}
+
+.weatherHeading h2 {
+  margin: 0;
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 700;
+}
+
+.live {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 21px;
+  padding: 0 9px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.15);
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.liveDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #a9ed42;
+  animation: fxPulse 2s infinite;
+}
+
+.weatherContent {
+  display: grid;
+  grid-template-columns: 190px 1fr 1fr 1fr;
+  height: 78px;
+  align-items: center;
+}
+
+.weatherMain {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.weatherIcon {
+  width: 73px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffdd35;
+}
+
+.temp {
+  font-size: 34px;
+  line-height: 35px;
+  font-weight: 750;
+  letter-spacing: -1.5px;
+}
+
+.condition {
+  margin-top: 2px;
+  font-size: 11px;
+  line-height: 15px;
+  font-weight: 600;
+}
+
+.weatherStat {
+  height: 48px;
+  padding-left: 18px;
+  border-left: 1px solid rgba(255, 255, 255, 0.27);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.weatherStatLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  line-height: 14px;
+  font-weight: 600;
+}
+
+.weatherStatValue {
+  margin-top: 3px;
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 700;
+}
+
+.weatherError {
+  width: 100%;
+  height: 155px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #69746e;
+  font-size: 13px;
+}
+
+.retry {
+  height: 32px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 7px;
+  background: #eaf8ed;
+  color: #08752f;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+/* =========================================================
+   MAIN GRID
+   ========================================================= */
+
+.mainGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.935fr) minmax(0, 1fr);
+  column-gap: 24px;
+  row-gap: 17px;
+  width: 100%;
+}
+
+/* =========================================================
+   COMMON CARD
+   ========================================================= */
+
+.card {
+  min-width: 0;
+  border: 1px solid #e5ebe7;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 3px 14px rgba(18, 65, 34, 0.045);
+  overflow: hidden;
+}
+
+.cardHeader {
+  height: 64px;
+  padding: 13px 18px 8px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.headerIcon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #07943c;
+  background: transparent;
+}
+
+.headerIcon svg {
+  width: 25px;
+  height: 25px;
+  stroke-width: 2.35;
+}
+
+.cardHeader h2 {
+  margin: 0;
+  color: #111923;
+  font-size: 17px;
+  line-height: 21px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+/* =========================================================
+   CROP TRACKER
+   ========================================================= */
+
+.cropCard {
+  width: 100%;
+  height: 423px;
+  border: 1px solid #e5ebe7;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 3px 14px rgba(18, 65, 34, 0.045);
+  overflow: hidden;
+}
+
+.cropBody {
+  padding: 0 17px 8px;
+}
+
+.cropSummary {
+  width: 100%;
+  height: 108px;
+  display: grid;
+  grid-template-columns: minmax(0, 2.2fr) minmax(150px, 0.9fr);
+  gap: 17px;
+}
+
+.activeCrop {
+  height: 108px;
+  padding: 12px 12px;
+  display: flex;
+  align-items: center;
+  border: 1px solid #e5ebe7;
+  border-radius: 13px;
+  background: #ffffff;
+}
+
+.cropIcon {
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+  margin-right: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 13px;
+  background: linear-gradient(145deg, #159b45, #08752f);
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(8, 117, 47, 0.1);
+}
+
+.cropIcon svg {
+  width: 35px;
+  height: 35px;
+  stroke-width: 1.8;
+}
+
+.label {
+  display: block;
+  margin: 0 0 2px;
+  color: #4f5b54;
+  font-size: 14px;
+  line-height: 17px;
+  font-weight: 400;
+}
+
+.cropName {
+  display: block;
+  margin: 0;
+  color: #111923;
+  font-size: 18px;
+  line-height: 27px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+}
+
+.days {
+  height: 108px;
+  padding: 12px 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border: 1px solid #e5ebe7;
+  border-radius: 13px;
+  background: #ffffff;
+  text-align: center;
+}
+
+.days .label {
+  margin: 0 0 3px;
+  font-size: 13px;
+  line-height: 17px;
+}
+
+.days strong {
+  display: block;
+  color: #111923;
+  font-size: 20px;
+  line-height: 29px;
+  font-weight: 700;
+}
+
+.days strong small {
+  font-size: 14px;
+  line-height: 17px;
+  font-weight: 500;
+}
+
+.daysTotal {
+  display: block;
+  margin-top: 3px;
+  color: #5f6b64;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+/* =========================================================
+   PROGRESS
+   ========================================================= */
+
+.progress {
+  margin-top: 14px;
+}
+
+.progressHeading {
+  height: 21px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #303b34;
+  font-size: 14px;
+  line-height: 19px;
+}
+
+.progressHeading strong {
+  color: #182019;
+  font-size: 14px;
+  line-height: 19px;
+  font-weight: 650;
+}
+
+.progressTrack {
+  width: calc(100% - 48px);
+  height: 12px;
+  margin-top: 4px;
+  display: inline-block;
+  vertical-align: middle;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #e9ecea;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 20px;
+  background: #079b3c;
+}
+
+.progressPercent {
+  width: 40px;
+  display: inline-block;
+  margin-left: 4px;
+  vertical-align: middle;
+  text-align: right;
+  color: #252e28;
+  font-size: 14px;
+  line-height: 17px;
+  font-weight: 650;
+}
+
+/* =========================================================
+   TIMELINE
+   ========================================================= */
+
+.timeline {
+  position: relative;
+  height: 75px;
+  margin: 3px 2px 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-items: start;
+}
+
+.timelineLine {
+  position: absolute;
+  top: 16px;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background: #dfe4e1;
+  z-index: 0;
+}
+
+.stage {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  color: #4c5750;
+  font-size: 13px;
+  line-height: 17px;
+  text-align: center;
+}
+
+.stage > span {
+  margin-top: 4px;
+  white-space: nowrap;
+}
+
+.stageSprout {
+  width: 25px;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #07943c;
+  background: #ffffff;
+  position: relative;
+  z-index: 3;
+  padding: 0 2px;
+}
+
+.stageSprout svg {
+  width: 24px;
+  height: 24px;
+  stroke-width: 2;
+}
+
+.stageDot {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border: 2px solid #aeb6b1;
+  border-radius: 50%;
+  background: #ffffff;
+  position: relative;
+  z-index: 3;
+}
+
+.stage.completed .stageDot {
+  background: #07943c;
+  border-color: #07943c;
+}
+
+.stage.completed .stageDot::after {
+  content: "✓";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  color: #ffffff;
+  font-size: 10px;
+  line-height: 10px;
+  font-weight: 800;
+}
+
+.stage.active {
+  color: #08752f;
+  font-weight: 650;
+}
+
+.stage.active .stageDot {
+  background: #07943c;
+  border-color: #07943c;
+  box-shadow: none;
+}
+
+/* =========================================================
+   ADVICE
+   ========================================================= */
+
+.advice {
+  width: 100%;
+  height: 54px;
+  min-height: 54px;
+  margin-top: 0;
+  padding: 8px 11px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  border: 1px solid #dcebdd;
+  border-radius: 10px;
+  background: #f3faf4;
+}
+
+.adviceIcon {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: #07933b;
+}
+
+.adviceIcon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.advice strong {
+  display: block;
+  margin: 0;
+  color: #08752f;
+  font-size: 13px;
+  line-height: 17px;
+  font-weight: 650;
+}
+
+.advice p {
+  margin: 0;
+  color: #39473e;
+  font-size: 11px;
+  line-height: 16px;
+}
+
+/* =========================================================
+   RESET
+   ========================================================= */
+
+.resetWrapper {
+  height: 25px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+
+.reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 1px 2px;
+  border: none;
+  background: transparent;
+  color: #e52b2b;
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.reset svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* =========================================================
+   CROP SETUP
+   ========================================================= */
+
+.cropSetup {
+  padding: 16px;
+  border: 1px solid #e6ece8;
+  border-radius: 12px;
+  background: #fbfdfb;
+}
+
+.setupGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 6px;
+  color: #34413a;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.formGroup select,
+.formGroup input {
+  width: 100%;
+  height: 39px;
+  padding: 0 10px;
+  border: 1px solid #dbe3de;
+  border-radius: 8px;
+  outline: none;
+  background: #ffffff;
+  color: #18231c;
+  font-size: 12px;
+}
+
+.trackButton {
+  width: 100%;
+  height: 38px;
+  margin-top: 13px;
+  border: none;
+  border-radius: 8px;
+  background: #078b39;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.trackButton:disabled {
+  background: #b9c5bd;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   FARM STATUS
+   ========================================================= */
+
+.statusCard {
+  width: 100%;
+  height: 423px;
+  border: 1px solid #e5ebe7;
+  border-radius: 18px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.statusCard .cardHeader {
+  padding: 13px 18px 8px;
+}
+
+.statusCard .headerIcon {
+  width: 29px;
+  height: 29px;
+  color: #ffffff;
+  background: #087d3a;
+  border-radius: 9px;
+}
+
+.statusCard .headerIcon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.statusBody {
+  margin: 0 17px;
+  border: 1px solid #e5ebe7;
+  border-radius: 13px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.statusRow {
+  height: 53px;
+  min-height: 53px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  padding: 0 15px;
+  border-bottom: 1px solid #e7ebe9;
+}
+
+.statusRow:last-child {
+  border-bottom: none;
+}
+
+.statusLabel {
+  color: #263229;
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 400;
+}
+
+.statusValue {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: #111b15;
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 600;
+}
+
+.statusValue strong {
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 650;
+}
+
+.activeBadge {
+  padding: 5px 10px;
+  border: 1px solid #dcefdc;
+  border-radius: 18px;
+  background: #eff9ef;
+  color: #14732e;
+  font-size: 10px;
+  line-height: 14px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.normalBadge {
+  padding: 5px 10px;
+  border: 1px solid #f8e1bf;
+  border-radius: 18px;
+  background: #fff7eb;
+  color: #e36b05;
+  font-size: 10px;
+  line-height: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.safe {
+  color: #078e3a;
+}
+
+.unsafe {
+  color: #e03131;
+}
+
+.statusDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   QUICK ACCESS
+   ========================================================= */
+
+.quickCard {
+  grid-column: 1 / -1;
+  position: relative;
+  min-height: 270px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfefb 100%);
+}
+
+.quickCard::before {
+  content: "";
+  position: absolute;
+  width: 350px;
+  height: 350px;
+  right: -160px;
+  top: -190px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(37, 160, 73, 0.1), transparent 68%);
+}
+
+.quickHeader {
+  position: relative;
+  z-index: 3;
+  height: 66px;
+  padding: 13px 20px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.quickHeadingIcon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  color: #ffffff;
+  background: linear-gradient(145deg, #16a14c, #08752f);
+  box-shadow: 0 6px 14px rgba(7, 126, 50, 0.18);
+  animation: fxIconFloat 3.5s ease-in-out infinite;
+}
+
+.quickHeadingText {
+  flex: 1;
+}
+
+.quickHeadingText h2 {
+  margin: 0;
+  color: #142019;
+  font-size: 17px;
+  line-height: 21px;
+  font-weight: 750;
+}
+
+.quickHeadingText p {
+  margin: 2px 0 0;
+  color: #69766f;
+  font-size: 9px;
+}
+
+.quickHeaderPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 27px;
+  padding: 0 9px;
+  border: 1px solid #e0ebe2;
+  border-radius: 20px;
+  color: #08752f;
+  background: #f4faf5;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.quickHeaderPill span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #11a744;
+  animation: fxPulse 2s infinite;
+}
+
+.quickGrid {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 15px;
+  padding: 0 15px 17px;
+}
+
+/* =========================================================
+   QUICK ITEM
+   ========================================================= */
+
+.quickItem {
+  --accent: #078f3c;
+  --soft: #eaf8ee;
+  --deep: #076f30;
+
+  position: relative;
+  min-height: 185px;
+  overflow: hidden;
+  border: 1px solid rgba(23, 65, 39, 0.1);
+  border-radius: 17px;
+  padding: 15px;
+  background: linear-gradient(145deg, #ffffff 0%, #fbfdfb 100%);
+  box-shadow: 0 4px 14px rgba(18, 65, 34, 0.035);
+  cursor: pointer;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.35s ease, border-color 0.35s ease;
+}
+
+.quickItem:hover {
+  transform: translateY(-7px);
+  border-color: color-mix(in srgb, var(--accent) 25%, #ffffff);
+  box-shadow: 0 18px 35px rgba(18, 65, 34, 0.12);
+}
+
+.quickItem::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -130%;
+  width: 70%;
+  height: 100%;
+  transform: skewX(-18deg);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.65),
+    transparent
+  );
+  transition: left 0.7s ease;
+}
+
+.quickItem:hover::before {
+  left: 150%;
+}
+
+.quickItem::after {
+  content: "";
+  position: absolute;
+  left: 15px;
+  right: 15px;
+  top: 0;
+  height: 3px;
+  border-radius: 0 0 5px 5px;
+  background: linear-gradient(90deg, var(--accent), transparent);
+  opacity: 0.8;
+}
+
+/* =========================================================
+   QUICK ITEM COLORS
+   ========================================================= */
+
+.quickItemGreen {
+  --accent: #07943d;
+  --soft: #eaf8ee;
+  --deep: #076e2f;
+}
+
+.quickItemBlue {
+  --accent: #0877d1;
+  --soft: #eaf4ff;
+  --deep: #075da5;
+}
+
+.quickItemRed {
+  --accent: #ed3438;
+  --soft: #fff0f1;
+  --deep: #b91f24;
+}
+
+.quickItemOrange {
+  --accent: #f18a0a;
+  --soft: #fff5e8;
+  --deep: #c76500;
+}
+
+.quickNumber {
+  position: absolute;
+  right: 13px;
+  top: 11px;
+  color: #cbd5ce;
+  font-size: 9px;
+  line-height: 12px;
+  font-weight: 750;
+  letter-spacing: 1px;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.quickItem:hover .quickNumber {
+  color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.quickGlow {
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  right: -45px;
+  top: -45px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.035;
+  transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+.quickItem:hover .quickGlow {
+  transform: scale(2.5);
+  opacity: 0.07;
+}
+
+.quickTop {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.quickIcon {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  color: #ffffff;
+  background: var(--accent);
+  box-shadow: 0 8px 17px color-mix(in srgb, var(--accent) 24%, transparent);
+  transition: transform 0.35s ease, border-radius 0.35s ease;
+}
+
+.quickIcon::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+  border-radius: 18px;
+  opacity: 0;
+  transform: scale(0.7);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.quickItem:hover .quickIcon {
+  transform: rotate(-5deg) scale(1.08);
+  border-radius: 17px;
+}
+
+.quickItem:hover .quickIcon::before {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.quickIcon svg {
+  position: relative;
+  z-index: 2;
+}
+
+.quickLabel {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--accent);
+  font-size: 8px;
+  font-weight: 750;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.quickTitle {
+  margin: 0;
+  color: #152019;
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 750;
+}
+
+.quickDescription {
+  position: relative;
+  z-index: 3;
+  width: 78%;
+  min-height: 51px;
+  margin: 12px 0 10px;
+  color: #59655e;
+  font-size: 10px;
+  line-height: 15px;
+}
+
+.quickButton {
+  position: relative;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 11px 0 13px;
+  border: none;
+  border-radius: 9px;
+  color: #ffffff;
+  background: var(--accent);
+  font-size: 9px;
+  font-weight: 750;
+  cursor: pointer;
+  box-shadow: 0 7px 15px color-mix(in srgb, var(--accent) 20%, transparent);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, padding 0.25s ease;
+}
+
+.quickButton svg {
+  transition: transform 0.25s ease;
+}
+
+.quickButton:hover {
+  transform: translateY(-2px);
+  padding-right: 9px;
+  box-shadow: 0 10px 20px color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+.quickButton:hover svg {
+  transform: translateX(3px);
+}
+
+.quickDecoration {
+  position: absolute;
+  right: -11px;
+  bottom: -16px;
+  color: var(--accent);
+  opacity: 0.085;
+  transform: rotate(-12deg) scale(1.25);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.quickItem:hover .quickDecoration {
+  opacity: 0.14;
+  transform: rotate(-4deg) scale(1.4) translate(-5px, -5px);
+}
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+
+@keyframes fxPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(17, 167, 68, 0.28);
+  }
+  70% {
+    box-shadow: 0 0 0 7px rgba(17, 167, 68, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(17, 167, 68, 0);
+  }
+}
+
+@keyframes fxIconFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1200px) {
+  .dashboard {
+    padding-left: 25px;
+    padding-right: 25px;
+  }
+
+  .weatherCard {
+    width: 68%;
+  }
+
+  .weatherContent {
+    grid-template-columns: 205px 1fr 1fr 1fr;
+  }
+
+  .welcomeContent {
+    width: 60%;
+  }
+
+  .quickDescription {
+    width: 82%;
+  }
+}
+
+@media (max-width: 1050px) {
+  .quickGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .quickCard {
+    min-height: 450px;
+  }
+
+  .quickItem {
+    min-height: 185px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .mainGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .quickCard {
+    grid-column: auto;
+  }
+
+  .weatherCard {
+    width: 100%;
+  }
+
+  .weatherOuter {
+    height: 155px;
+  }
+
+  .cropCard,
+  .statusCard {
+    height: auto;
+    min-height: 390px;
+  }
+
+  .welcomeContent {
+    width: 65%;
+  }
+}
+
+@media (max-width: 750px) {
+  .dashboard {
+    padding: 18px 14px 25px;
+  }
+
+  .welcome {
+    min-height: 205px;
+  }
+
+  .welcomeContent {
+    width: 100%;
+    padding: 22px 20px;
+  }
+
+  .welcomeTitle {
+    font-size: 24px;
+    line-height: 30px;
+  }
+
+  .welcomeSubtitle {
+    max-width: 80%;
+  }
+
+  .weatherCard {
+    height: auto;
+    min-height: 155px;
+  }
+
+  .weatherContent {
+    grid-template-columns: 1fr 1fr;
+    height: auto;
+    padding-top: 8px;
+  }
+
+  .weatherMain {
+    grid-column: 1 / -1;
+    margin-bottom: 8px;
+  }
+
+  .weatherStat {
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+    padding-top: 8px;
+  }
+
+  .cropSummary {
+    height: auto;
+    grid-template-columns: 1fr;
+  }
+
+  .quickCard {
+    min-height: auto;
+  }
+
+  .quickGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .welcome {
+    min-height: 235px;
+  }
+
+  .welcomeContent {
+    padding: 20px 17px;
+  }
+
+  .welcomeTitle {
+    font-size: 21px;
+    line-height: 28px;
+  }
+
+  .welcomeSubtitle {
+    max-width: 100%;
+    font-size: 12px;
+  }
+
+  .quickGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .quickCard {
+    min-height: auto;
+  }
+
+  .quickItem {
+    min-height: 175px;
+  }
+
+  .quickDescription {
+    width: 75%;
+  }
+
+  .quickHeaderPill {
+    display: none;
+  }
+}
+
+@media (max-width: 400px) {
+  .dashboard {
+    padding: 14px 10px 22px;
+  }
+
+  .welcome {
+    min-height: 230px;
+  }
+
+  .welcomeTitle {
+    font-size: 19px;
+  }
+
+  .quickIcon {
+    width: 46px;
+    height: 46px;
+  }
+
+  .quickTitle {
+    font-size: 13px;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard *,
+  .dashboard *::before,
+  .dashboard *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+.weatherStatusIcon {
+  width: 25px;
+  height: 25px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+}
+
+.weatherStatusIcon svg {
+  width: 22px !important;
+  height: 22px !important;
+}
+
+
+/* =========================================================
+   WEATHER OUTER - Container for Weather + Spray
+   ========================================================= */
+
+.weatherOuter {
+  position: relative;
+  width: 100%;
+  min-height: 116px;
+  margin: 0 0 14px;
+  overflow: visible;
+}
+
+/* =========================================================
+   WEATHER ROW - Weather + Spray Guidance Side by Side
+   ========================================================= */
+
+.weatherRow {
+  display: flex;
+  gap: 14px;
+  align-items: stretch;
+  width: 100%;
+  min-height: 116px;
+}
+
+/* =========================================================
+   WEATHER CARD - EXISTING STYLES (KEPT AS-IS)
+   ========================================================= */
+
+.weatherCard {
+  position: relative;
+  z-index: 3;
+  width: 61.5%;
+  height: 116px;
+  padding: 12px 18px;
+  border-radius: 15px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #075e2d 0%, #087d3a 55%, #128d46 100%);
+  box-shadow: 0 7px 18px rgba(0, 99, 42, 0.16);
+  flex-shrink: 0;
+}
+
+.weatherHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 20px;
+}
+
+.weatherHeading h2 {
+  margin: 0;
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 700;
+}
+
+.live {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 21px;
+  padding: 0 9px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.15);
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.liveDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #a9ed42;
+  animation: fxPulse 2s infinite;
+}
+
+.weatherContent {
+  display: grid;
+  grid-template-columns: 190px 1fr 1fr 1fr;
+  height: 78px;
+  align-items: center;
+}
+
+.weatherMain {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.weatherIcon {
+  width: 73px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffdd35;
+}
+
+.weatherIcon svg {
+  width: 61px;
+  height: 61px;
+}
+
+.temp {
+  font-size: 34px;
+  line-height: 35px;
+  font-weight: 750;
+  letter-spacing: -1.5px;
+}
+
+.condition {
+  margin-top: 2px;
+  font-size: 11px;
+  line-height: 15px;
+  font-weight: 600;
+}
+
+.weatherStat {
+  height: 48px;
+  padding-left: 18px;
+  border-left: 1px solid rgba(255, 255, 255, 0.27);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.weatherStatLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  line-height: 14px;
+  font-weight: 600;
+}
+
+.weatherStatValue {
+  margin-top: 3px;
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 700;
+}
+/* =========================================================
+   WEATHER OUTER - Container for Weather + Spray
+   ========================================================= */
+
+.weatherOuter {
+  position: relative;
+  width: 100%;
+  min-height: 116px;
+  margin: 0 0 14px;
+  overflow: visible;
+}
+
+/* =========================================================
+   WEATHER ROW - Weather + Spray Guidance Side by Side
+   ========================================================= */
+
+.weatherRow {
+  display: flex;
+  gap: 14px;
+  align-items: stretch;
+  width: 100%;
+  min-height: 116px;
+}
+
+/* =========================================================
+   WEATHER CARD - EXISTING STYLES (KEPT AS-IS)
+   ========================================================= */
+
+.weatherCard {
+  position: relative;
+  z-index: 3;
+  width: 61.5%;
+  height: 116px;
+  padding: 12px 18px;
+  border-radius: 15px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #075e2d 0%, #087d3a 55%, #128d46 100%);
+  box-shadow: 0 7px 18px rgba(0, 99, 42, 0.16);
+  flex-shrink: 0;
+}
+
+.weatherHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 20px;
+}
+
+.weatherHeading h2 {
+  margin: 0;
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 700;
+}
+
+.live {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 21px;
+  padding: 0 9px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.15);
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.liveDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #a9ed42;
+  animation: fxPulse 2s infinite;
+}
+
+.weatherContent {
+  display: grid;
+  grid-template-columns: 190px 1fr 1fr 1fr;
+  height: 78px;
+  align-items: center;
+}
+
+.weatherMain {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.weatherIcon {
+  width: 73px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffdd35;
+}
+
+.weatherIcon svg {
+  width: 61px;
+  height: 61px;
+}
+
+.temp {
+  font-size: 34px;
+  line-height: 35px;
+  font-weight: 750;
+  letter-spacing: -1.5px;
+}
+
+.condition {
+  margin-top: 2px;
+  font-size: 11px;
+  line-height: 15px;
+  font-weight: 600;
+}
+
+.weatherStat {
+  height: 48px;
+  padding-left: 18px;
+  border-left: 1px solid rgba(255, 255, 255, 0.27);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.weatherStatLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  line-height: 14px;
+  font-weight: 600;
+}
+
+.weatherStatValue {
+  margin-top: 3px;
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 700;
+}
+
+/* =========================================================
+   SPRAY GUIDANCE CARD - WITH BORDER & BACKGROUND COLORS
+   ========================================================= */
+
+.sprayBadge {
+  flex: 0 0 auto;
+  width: 175px;
+  min-width: 225px;
+  max-width: 225px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04); */
+  transition: all 0.3s ease;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Safe State - Light Green Theme */
+.sprayBadgeSafe {
+  /* background: linear-gradient(145deg, #f0fdf4, #dcfce7); */
+  border: 3px solid #86efac;
+  /* box-shadow: 0 4px 16px rgba(22, 163, 74, 0.08); */
+}
+
+.sprayBadgeSafe:hover {
+  box-shadow: 0 8px 28px rgba(22, 163, 74, 0.12);
+  transform: translateY(-3px);
+  border-color: #4ade80;
+}
+
+/* Unsafe State - Light Red Theme */
+.sprayBadgeUnsafe {
+  background: linear-gradient(145deg, #fef2f2, #fee2e2);
+  border: 1.5px solid #fca5a5;
+  box-shadow: 0 4px 16px rgba(220, 38, 38, 0.08);
+}
+
+.sprayBadgeUnsafe:hover {
+  box-shadow: 0 8px 28px rgba(220, 38, 38, 0.12);
+  transform: translateY(-3px);
+  border-color: #f87171;
+}
+
+/* =========================================================
+   BADGE HEADER
+   ========================================================= */
+
+.sprayBadgeHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px 6px 14px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.sprayBadgeHeaderIcon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.sprayBadgeSafe .sprayBadgeHeaderIcon {
+  background: rgba(22, 163, 74, 0.15);
+  color: #16a34a;
+}
+
+.sprayBadgeUnsafe .sprayBadgeHeaderIcon {
+  background: rgba(220, 38, 38, 0.15);
+  color: #dc2626;
+}
+
+.sprayBadgeHeaderIcon svg {
+  width: 12px;
+  height: 12px;
+}
+
+.sprayBadgeHeaderTitle {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.sprayBadgeSafe .sprayBadgeHeaderTitle {
+  color: #15803d;
+}
+
+.sprayBadgeUnsafe .sprayBadgeHeaderTitle {
+  color: #b91c1c;
+}
+
+/* =========================================================
+   BADGE BODY
+   ========================================================= */
+
+.sprayBadgeBody {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px 12px 14px;
+}
+
+/* Status Icon */
+.sprayBadgeStatusIcon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  flex-shrink: 0;
+  font-size: 16px;
+}
+
+.sprayBadgeSafe .sprayBadgeStatusIcon {
+  background: rgba(22, 163, 74, 0.12);
+  box-shadow: 0 0 0 1px rgba(22, 163, 74, 0.08);
+}
+
+.sprayBadgeUnsafe .sprayBadgeStatusIcon {
+  background: rgba(220, 38, 38, 0.12);
+  box-shadow: 0 0 0 1px rgba(220, 38, 38, 0.08);
+}
+
+/* Text Content */
+.sprayBadgeBodyText {
+  flex: 1;
+  min-width: 0;
+}
+
+.sprayBadgeStatusText {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 18px;
+}
+
+.sprayBadgeSafe .sprayBadgeStatusText {
+  color: #15803d;
+}
+
+.sprayBadgeUnsafe .sprayBadgeStatusText {
+  color: #b91c1c;
+}
+
+.sprayBadgeDesc {
+  font-size: 10px;
+  line-height: 14px;
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sprayBadgeSafe .sprayBadgeDesc {
+  color: #4a7a5a;
+}
+
+.sprayBadgeUnsafe .sprayBadgeDesc {
+  color: #7a4a4a;
+}
+
+/* =========================================================
+   BADGE INDICATOR BAR
+   ========================================================= */
+
+.sprayBadgeIndicator {
+  width: 5px;
+  height: 36px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.sprayBadgeSafe .sprayBadgeIndicator {
+  background: linear-gradient(180deg, #4ade80, #16a34a, #15803d);
+  box-shadow: 0 0 12px rgba(22, 163, 74, 0.15);
+}
+
+.sprayBadgeUnsafe .sprayBadgeIndicator {
+  background: linear-gradient(180deg, #f87171, #ef4444, #dc2626);
+  box-shadow: 0 0 12px rgba(220, 38, 38, 0.15);
+}
+
+/* =========================================================
+   DECORATIVE GLOW
+   ========================================================= */
+
+.sprayBadge::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  right: -30%;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.15;
+}
+
+.sprayBadgeSafe::before {
+  background: radial-gradient(circle, #4ade80, transparent 70%);
+}
+
+.sprayBadgeUnsafe::before {
+  background: radial-gradient(circle, #f87171, transparent 70%);
+}
+
+/* =========================================================
+   WEATHER STATUS ICON (in Farm Status)
+   ========================================================= */
+
+.weatherStatusIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1200px) {
+  .weatherCard {
+    width: 68%;
+  }
+
+  .sprayBadge {
+    width: 155px;
+    min-width: 135px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .weatherRow {
+    flex-direction: column;
+    min-height: auto;
+    gap: 12px;
+  }
+
+  .weatherCard {
+    width: 100% !important;
+    height: auto;
+    min-height: 116px;
+  }
+
+  .sprayBadge {
+    width: 100%;
+    max-width: 100%;
+    min-height: auto;
+  }
+
+  .sprayBadgeDesc {
+    white-space: normal;
+  }
+}
+
+@media (max-width: 750px) {
+  .weatherCard {
+    min-height: 110px;
+    padding: 12px 16px;
+  }
+
+  .weatherContent {
+    grid-template-columns: 160px 1fr 1fr 1fr;
+  }
+
+  .weatherIcon {
+    width: 60px;
+    height: 55px;
+  }
+
+  .weatherIcon svg {
+    width: 50px;
+    height: 50px;
+  }
+
+  .temp {
+    font-size: 28px;
+    line-height: 30px;
+  }
+
+  .weatherStat {
+    padding-left: 12px;
+  }
+
+  .weatherStatLabel {
+    font-size: 9px;
+  }
+
+  .weatherStatValue {
+    font-size: 12px;
+  }
+
+  .sprayBadge {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .sprayBadgeHeader {
+    padding: 8px 12px 4px 12px;
+  }
+
+  .sprayBadgeBody {
+    padding: 6px 12px 10px 12px;
+    gap: 8px;
+  }
+
+  .sprayBadgeStatusIcon {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .sprayBadgeStatusText {
+    font-size: 13px;
+  }
+
+  .sprayBadgeDesc {
+    font-size: 9px;
+  }
+
+  .sprayBadgeIndicator {
+    height: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .weatherCard {
+    min-height: 100px;
+    padding: 10px 14px;
+  }
+
+  .weatherContent {
+    grid-template-columns: 1fr 1fr;
+    height: auto;
+    padding-top: 6px;
+  }
+
+  .weatherMain {
+    grid-column: 1 / -1;
+    margin-bottom: 6px;
+  }
+
+  .weatherStat {
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    padding-top: 6px;
+    height: auto;
+    min-height: 35px;
+  }
+
+  .weatherIcon {
+    width: 50px;
+    height: 45px;
+  }
+
+  .weatherIcon svg {
+    width: 42px;
+    height: 42px;
+  }
+
+  .temp {
+    font-size: 24px;
+    line-height: 26px;
+  }
+
+  .sprayBadge {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .sprayBadgeHeader {
+    padding: 6px 10px 3px 10px;
+  }
+
+  .sprayBadgeHeaderTitle {
+    font-size: 9px;
+  }
+
+  .sprayBadgeBody {
+    padding: 4px 10px 8px 10px;
+    gap: 6px;
+  }
+
+  .sprayBadgeStatusIcon {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+
+  .sprayBadgeStatusText {
+    font-size: 12px;
+  }
+
+  .sprayBadgeDesc {
+    font-size: 8px;
+    line-height: 11px;
+  }
+
+  .sprayBadgeIndicator {
+    height: 28px;
+    width: 4px;
+  }
+}

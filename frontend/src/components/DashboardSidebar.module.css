@@ -1,0 +1,370 @@
+/* src/components/DashboardSidebar.module.css */
+
+/* =========================================================
+   SIDEBAR CONTAINER - NO SCROLL
+   ========================================================= */
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 260px;
+  background: linear-gradient(180deg, #0f172a 0%, #0a1628 100%);
+  color: #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+              transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 100;
+  overflow: hidden;
+  border-right: 1px solid rgba(255, 255, 255, 0.03);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+}
+
+/* =========================================================
+   SIDEBAR HEADER - FIXED
+   ========================================================= */
+
+.sidebarHeader {
+  padding: 1.25rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 72px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+}
+
+.logoIcon {
+  font-size: 1.6rem;
+  transition: transform 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar:not(.collapsed) .logoIcon {
+  animation: logoFloat 3s ease-in-out infinite;
+}
+
+.logoText {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: white;
+  white-space: nowrap;
+  letter-spacing: -0.3px;
+}
+
+.logoHighlight {
+  background: linear-gradient(135deg, #16a34a, #eab308);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.closeBtn {
+  display: none;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.closeBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #e2e8f0;
+}
+
+/* =========================================================
+   NAVIGATION - FLEXIBLE, NO SCROLL
+   ========================================================= */
+
+.nav {
+  flex: 1;
+  padding: 0.5rem 0.75rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  overflow: visible;
+}
+
+.navCategory {
+  margin-bottom: 0.25rem;
+}
+
+.categoryLabel {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.25);
+  padding: 0.35rem 0.75rem 0.15rem;
+  transition: color 0.3s ease;
+}
+
+.categoryLabel:hover {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* =========================================================
+   NAV ITEMS - BOLD & INTERACTIVE
+   ========================================================= */
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  color: white;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  font-weight: 600;
+}
+
+/* =========================================================
+   ACTIVE INDICATOR - LEFT BORDER
+   ========================================================= */
+
+.navItem::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%) scaleX(0);
+  width: 3px;
+  height: 24px;
+  background: linear-gradient(180deg, #16a34a, #eab308);
+  border-radius: 0 4px 4px 0;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* =========================================================
+   HOVER EFFECTS - GLOW & SCALE
+   ========================================================= */
+
+.navItem:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  transform: translateX(3px);
+}
+
+.navItem:hover .navIcon {
+  color: #4ade80;
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.navItem:hover .navLabel {
+  color: #ffffff;
+  opacity: 1;
+}
+
+/* =========================================================
+   ACTIVE STATE - BOLD & GLOWING
+   ========================================================= */
+
+.navItem.active {
+  background: rgba(22, 163, 74, 0.10);
+  color: #4ade80;
+  font-weight: 600;
+}
+
+.navItem.active::before {
+  transform: translateY(-50%) scaleX(1);
+}
+
+.navItem.active .navIcon {
+  color: #4ade80;
+  opacity: 1;
+  filter: drop-shadow(0 0 8px rgba(22, 163, 74, 0.3));
+}
+
+.navItem.active .navLabel {
+  color: #4ade80;
+  opacity: 1;
+  font-weight: 600;
+}
+
+/* =========================================================
+   ICON STYLES - BOLD & INTERACTIVE
+   ========================================================= */
+
+.navIcon {
+  flex-shrink: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0.6;
+  stroke-width: 2;
+}
+
+/* =========================================================
+   LABEL STYLES - BOLD
+   ========================================================= */
+
+.navLabel {
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0.8;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: -0.2px;
+}
+
+/* =========================================================
+   DIVIDER
+   ========================================================= */
+
+.navDivider {
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
+  margin: 0.35rem 0.75rem;
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   COLLAPSED SIDEBAR OVERRIDES
+   ========================================================= */
+
+.sidebar.collapsed .navLabel,
+.sidebar.collapsed .categoryLabel {
+  display: none;
+}
+
+.sidebar.collapsed .navItem {
+  justify-content: center;
+  padding: 0.45rem;
+  margin: 0 auto;
+  width: 42px;
+  height: 42px;
+  border-radius: 0.65rem;
+}
+
+.sidebar.collapsed .navItem::before {
+  display: none;
+}
+
+.sidebar.collapsed .navItem.active {
+  background: rgba(22, 163, 74, 0.15);
+  box-shadow: 0 0 24px rgba(22, 163, 74, 0.08);
+}
+
+.sidebar.collapsed .navItem:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: scale(1.05) translateX(0);
+}
+
+.sidebar.collapsed .navItem:hover .navIcon {
+  transform: scale(1.15);
+}
+
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+
+@keyframes logoFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-3px) rotate(3deg);
+  }
+}
+
+/* =========================================================
+   MOBILE SIDEBAR
+   ========================================================= */
+
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+    width: 280px;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.4);
+    overflow-y: auto;
+  }
+  
+  .sidebar.mobileOpen {
+    transform: translateX(0);
+  }
+
+  .closeBtn {
+    display: block;
+  }
+
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 99;
+    backdrop-filter: blur(4px);
+    animation: overlayFade 0.3s ease;
+  }
+
+  @keyframes overlayFade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .sidebar.collapsed {
+    width: 280px;
+  }
+
+  .sidebar.collapsed .navLabel,
+  .sidebar.collapsed .categoryLabel {
+    display: block;
+  }
+
+  .sidebar.collapsed .navItem {
+    justify-content: flex-start;
+    padding: 0.5rem 0.75rem;
+    width: auto;
+    height: auto;
+  }
+
+  .sidebar.collapsed .navItem::before {
+    display: block;
+  }
+}
+
+/* =========================================================
+   DARK MODE PREFERENCE
+   ========================================================= */
+
+@media (prefers-color-scheme: dark) {
+  .sidebar {
+    background: linear-gradient(180deg, #0a1628 0%, #060e1a 100%);
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar,
+  .sidebar *,
+  .sidebar *::before,
+  .sidebar *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,112 @@
+[
+  {
+    "name": "STL Samarlakot",
+    "address": "SM & AR Farm Campus, Opp. North Railway Cabin, Samalkot, Kakinada District, Andhra Pradesh",
+    "phone": "Not Available",
+    "latitude": 17.0568,
+    "longitude": 82.1685,
+    "website": "",
+    "operating_hours": "9:00 AM - 5:00 PM",
+    "description": "Government Soil Testing Laboratory",
+    "verified": true
+  },
+  {
+    "name": "AMC Soil Testing Laboratory Rajamahendravaram",
+    "address": "Agriculture Market Yard, Korukonda Road, Rajamahendravaram, Andhra Pradesh",
+    "phone": "Not Available",
+    "latitude": 17.0005,
+    "longitude": 81.804,
+    "website": "",
+    "operating_hours": "9:00 AM - 5:00 PM",
+    "description": "Government Soil Testing Laboratory",
+    "verified": true
+  },
+  {
+    "name": "STL Anakapalli",
+    "address": "Opp. Union Bank of India, Gundala Street, Anakapalle, Andhra Pradesh",
+    "phone": "Not Available",
+    "latitude": 17.6912,
+    "longitude": 83.0039,
+    "website": "",
+    "operating_hours": "9:00 AM - 5:00 PM",
+    "description": "Government Soil Testing Laboratory",
+    "verified": true
+  },
+  {
+    "name": "MSTL Visakhapatnam",
+    "address": "Near PM Palem, Visakhapatnam, Andhra Pradesh",
+    "phone": "Not Available",
+    "latitude": 17.7828,
+    "longitude": 83.377,
+    "website": "",
+    "operating_hours": "9:00 AM - 5:00 PM",
+    "description": "Mobile Soil Testing Laboratory",
+    "verified": true
+  },
+  {
+    "name": "Soil Testing Laboratory Tirupati",
+    "address": "RARS Campus, Tirupati, Andhra Pradesh",
+    "phone": "Not Available",
+    "latitude": 13.6288,
+    "longitude": 79.4192,
+    "website": "",
+    "operating_hours": "9:00 AM - 5:00 PM",
+    "description": "Government Soil Testing Laboratory",
+    "verified": true
+  },
+  {
+    "name": "Soil Testing Laboratory Anantapur",
+    "address": "Adimurthy Nagar, Anantapur, Andhra Pradesh",
+    "phone": "Not Available",
+    "latitude": 14.6819,
+    "longitude": 77.6006,
+    "website": "",
+    "operating_hours": "9:00 AM - 5:00 PM",
+    "description": "Government Soil Testing Laboratory",
+    "verified": true
+  },
+  {
+    "name": "Soil Testing Laboratory Kurnool",
+    "address": "Department of Agriculture, Kurnool, Andhra Pradesh",
+    "phone": "Not Available",
+    "latitude": 15.8281,
+    "longitude": 78.0373,
+    "website": "",
+    "operating_hours": "9:00 AM - 5:00 PM",
+    "description": "Government Soil Testing Laboratory",
+    "verified": true
+  },
+  {
+    "name": "Soil Testing Laboratory SPSR Nellore",
+    "address": "Department of Agriculture, SPSR Nellore, Andhra Pradesh",
+    "phone": "Not Available",
+    "latitude": 14.4426,
+    "longitude": 79.9865,
+    "website": "",
+    "operating_hours": "9:00 AM - 5:00 PM",
+    "description": "Government Soil Testing Laboratory",
+    "verified": true
+  },
+  {
+    "name": "Soil Testing Laboratory Guntur",
+    "address": "Department of Agriculture, Guntur, Andhra Pradesh",
+    "phone": "Not Available",
+    "latitude": 16.3067,
+    "longitude": 80.4365,
+    "website": "",
+    "operating_hours": "9:00 AM - 5:00 PM",
+    "description": "Government Soil Testing Laboratory",
+    "verified": true
+  },
+  {
+    "name": "Soil Testing Laboratory Kadapa",
+    "address": "Department of Agriculture, YSR Kadapa, Andhra Pradesh",
+    "phone": "Not Available",
+    "latitude": 14.4673,
+    "longitude": 78.8242,
+    "website": "",
+    "operating_hours": "9:00 AM - 5:00 PM",
+    "description": "Government Soil Testing Laboratory",
+    "verified": true
+  }
+]

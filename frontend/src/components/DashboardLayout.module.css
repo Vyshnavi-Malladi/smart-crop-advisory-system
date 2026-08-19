@@ -1,0 +1,53 @@
+/* src/components/DashboardLayout.module.css */
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+.mainContent {
+  flex: 1;
+  margin-left: 260px;
+  transition: margin-left 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.mainContent.expanded {
+  margin-left: 72px;
+}
+
+.contentArea {
+  flex: 1;
+  padding: 1.5rem 2rem;
+  margin-top: 4rem;
+}
+
+@media (max-width: 1024px) {
+  .mainContent {
+    margin-left: 72px;
+  }
+  
+  .contentArea {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .mainContent {
+    margin-left: 0;
+  }
+  
+  .contentArea {
+    padding: 1rem;
+    margin-top: 3.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .contentArea {
+    padding: 0.75rem;
+    margin-top: 3rem;
+  }
+}
