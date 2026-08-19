@@ -3477,6 +3477,1201 @@
 
 
 
+// // src/components/DashboardTopbar.jsx
+
+// import React, {
+//   useState,
+//   useRef,
+//   useEffect
+// } from "react";
+
+// import { Link } from "react-router-dom";
+
+// import {
+//   Menu,
+//   Globe,
+//   User,
+//   ChevronDown,
+//   LogOut,
+//   Settings,
+//   HelpCircle,
+//   UserCircle,
+//   Check,
+//   Play,
+//   ShoppingCart,
+//   Sprout
+// } from "lucide-react";
+
+// import Cookies from "js-cookie";
+
+// import {
+//   useTranslation
+// } from "react-i18next";
+
+// import {
+//   useDemo
+// } from "../context/DemoContext";
+
+// import api from "../api";
+
+// import CartDrawer
+//   from "../pages/CartDrawer";
+
+// import styles
+//   from "./DashboardTopbar.module.css";
+
+
+// const DashboardTopbar = ({
+//   onMenuClick
+// }) => {
+
+//   const {
+//     t,
+//     i18n
+//   } = useTranslation();
+
+//   const {
+//     startDemo
+//   } = useDemo();
+
+
+//   // ==========================================================
+//   // STATE
+//   // ==========================================================
+
+//   const [
+//     profileOpen,
+//     setProfileOpen
+//   ] = useState(false);
+
+//   const [
+//     langOpen,
+//     setLangOpen
+//   ] = useState(false);
+
+//   const [
+//     cartOpen,
+//     setCartOpen
+//   ] = useState(false);
+
+//   const [
+//     cart,
+//     setCart
+//   ] = useState([]);
+
+
+//   // ==========================================================
+//   // REFS
+//   // ==========================================================
+
+//   const profileRef =
+//     useRef(null);
+
+//   const langRef =
+//     useRef(null);
+
+
+//   // ==========================================================
+//   // USER
+//   // ==========================================================
+
+//   const user =
+//     Cookies.get("user")
+//       ? JSON.parse(
+//           Cookies.get("user")
+//         )
+//       : null;
+
+
+//   // ==========================================================
+//   // LANGUAGES
+//   // ==========================================================
+
+//   const languages = [
+
+//     {
+//       code: "en",
+//       label: t("english"),
+//       flag: "🇬🇧"
+//     },
+
+//     {
+//       code: "hi",
+//       label: t("hindi"),
+//       flag: "🇮🇳"
+//     },
+
+//     {
+//       code: "te",
+//       label: t("telugu"),
+//       flag: "🇮🇳"
+//     }
+
+//   ];
+
+
+//   const currentLanguage =
+//     languages.find(
+//       lang =>
+//         lang.code ===
+//         i18n.language
+//     ) || languages[0];
+
+
+//   // ==========================================================
+//   // FETCH CART
+//   // ==========================================================
+
+//   const fetchCart =
+//     async () => {
+
+//       try {
+
+//         const {
+//           data
+//         } = await api.get(
+//           "/cart"
+//         );
+
+
+//         const cleanedCart =
+//           (data?.items || [])
+//             .filter(
+//               item =>
+//                 item.productId
+//             )
+//             .map(
+//               item => ({
+//                 _id:
+//                   item.productId._id,
+
+//                 name:
+//                   item.productId.name,
+
+//                 price:
+//                   item.productId.price,
+
+//                 quantity:
+//                   item.quantity
+//               })
+//             );
+
+
+//         setCart(
+//           cleanedCart
+//         );
+
+
+//         return cleanedCart;
+
+//       } catch (error) {
+
+//         console.error(
+//           "Failed to fetch cart:",
+//           error
+//         );
+
+//         return [];
+
+//       }
+
+//     };
+
+
+//   // ==========================================================
+//   // INITIAL CART + REAL-TIME UPDATE
+//   // ==========================================================
+
+//   useEffect(() => {
+
+//     fetchCart();
+
+
+//     const handleCartUpdate =
+//       event => {
+
+//         if (
+//           event.detail &&
+//           event.detail.cart
+//         ) {
+
+//           setCart(
+//             event.detail.cart
+//           );
+
+//         } else {
+
+//           fetchCart();
+
+//         }
+
+//       };
+
+
+//     window.addEventListener(
+//       "cart-updated",
+//       handleCartUpdate
+//     );
+
+
+//     return () => {
+
+//       window.removeEventListener(
+//         "cart-updated",
+//         handleCartUpdate
+//       );
+
+//     };
+
+//   }, []);
+
+
+//   // ==========================================================
+//   // CLICK OUTSIDE
+//   // ==========================================================
+
+//   useEffect(() => {
+
+//     const handleClickOutside =
+//       event => {
+
+//         if (
+//           profileRef.current &&
+//           !profileRef.current.contains(
+//             event.target
+//           )
+//         ) {
+
+//           setProfileOpen(false);
+
+//         }
+
+
+//         if (
+//           langRef.current &&
+//           !langRef.current.contains(
+//             event.target
+//           )
+//         ) {
+
+//           setLangOpen(false);
+
+//         }
+
+//       };
+
+
+//     document.addEventListener(
+//       "mousedown",
+//       handleClickOutside
+//     );
+
+
+//     return () => {
+
+//       document.removeEventListener(
+//         "mousedown",
+//         handleClickOutside
+//       );
+
+//     };
+
+//   }, []);
+
+
+//   // ==========================================================
+//   // LOGOUT
+//   // ==========================================================
+
+//   const handleLogout =
+//     () => {
+
+//       Cookies.remove(
+//         "token"
+//       );
+
+//       Cookies.remove(
+//         "user"
+//       );
+
+//       window.location.href =
+//         "/login";
+
+//     };
+
+
+//   // ==========================================================
+//   // LANGUAGE
+//   // ==========================================================
+
+//   const changeLanguage =
+//     async langCode => {
+
+//       await i18n.changeLanguage(
+//         langCode
+//       );
+
+//       setLangOpen(false);
+
+//       localStorage.setItem(
+//         "preferred-language",
+//         langCode
+//       );
+
+//     };
+
+
+//   // ==========================================================
+//   // GUIDED TOUR
+//   // ==========================================================
+
+//   const handleGuidedTour =
+//     () => {
+
+//       setProfileOpen(false);
+
+//       localStorage.removeItem(
+//         "farmxpert_tour_completed"
+//       );
+
+//       localStorage.removeItem(
+//         "farmxpert_tour_skipped"
+//       );
+
+//       window.dispatchEvent(
+//         new CustomEvent(
+//           "start-guided-tour"
+//         )
+//       );
+
+//     };
+
+
+//   // ==========================================================
+//   // OPEN CART
+//   // ==========================================================
+
+//   const openCart =
+//     async () => {
+
+//       const latestCart =
+//         await fetchCart();
+
+
+//       if (latestCart) {
+
+//         setCart(
+//           latestCart
+//         );
+
+//       }
+
+
+//       setCartOpen(true);
+
+//       setProfileOpen(false);
+
+//       setLangOpen(false);
+
+//     };
+
+
+//   // ==========================================================
+//   // CART COUNT
+//   // ==========================================================
+
+//   const cartCount =
+//     cart.reduce(
+//       (
+//         total,
+//         item
+//       ) =>
+//         total +
+//         Number(
+//           item.quantity || 0
+//         ),
+//       0
+//     );
+
+
+//   // ==========================================================
+//   // ADMIN
+//   // ==========================================================
+
+//   const isAdmin =
+//     user?.role === "admin";
+
+
+//   // ==========================================================
+//   // RETURN
+//   // ==========================================================
+
+//   return (
+
+//     <>
+
+//       {/* ======================================================
+//           TOPBAR
+//           ====================================================== */}
+
+//       <header
+//         className={
+//           styles.topbar
+//         }
+//       >
+
+//         {/* ====================================================
+//             LEFT SECTION
+//             ==================================================== */}
+
+//         <div
+//           className={
+//             styles.left
+//           }
+//         >
+
+//           {/* MENU */}
+
+//           <button
+//             type="button"
+
+//             onClick={
+//               onMenuClick
+//             }
+
+//             className={
+//               styles.menuBtn
+//             }
+
+//             aria-label={
+//               t(
+//                 "topbar.openMenu"
+//               )
+//             }
+//           >
+
+//             <Menu
+//               size={22}
+//             />
+
+//           </button>
+
+
+//           {/* BRAND */}
+
+//           <div
+//             className={
+//               styles.brandArea
+//             }
+//           >
+
+//             <div
+//               className={
+//                 styles.brandIcon
+//               }
+//             >
+
+//               <Sprout
+//                 size={20}
+//                 strokeWidth={2.2}
+//               />
+
+//             </div>
+
+
+//             <div
+//               className={
+//                 styles.brandText
+//               }
+//             >
+
+//               <span
+//                 className={
+//                   styles.brandName
+//                 }
+//               >
+
+//                 FarmXpert
+
+//               </span>
+
+
+//               <span
+//                 className={
+//                   styles.brandSubtitle
+//                 }
+//               >
+
+//                 {t(
+//                   "smart_agriculture"
+//                 )}
+
+//               </span>
+
+//             </div>
+
+//           </div>
+
+//         </div>
+
+
+//         {/* ====================================================
+//             RIGHT SECTION
+//             ==================================================== */}
+
+//         <div
+//           className={
+//             styles.right
+//           }
+//         >
+
+//           {/* ==================================================
+//               GUIDED TOUR
+//               ================================================== */}
+
+//           {!isAdmin && (
+
+//             <button
+//               type="button"
+
+//               onClick={
+//                 handleGuidedTour
+//               }
+
+//               className={
+//                 styles.tourBtn
+//               }
+//             >
+
+//               <span
+//                 className={
+//                   styles.tourIcon
+//                 }
+//               >
+
+//                 <Play
+//                   size={14}
+//                   fill="currentColor"
+//                 />
+
+//               </span>
+
+
+//               <span
+//                 className={
+//                   styles.tourText
+//                 }
+//               >
+
+//                 {t(
+//                   "topbar.guidedTour"
+//                 )}
+
+//               </span>
+
+//             </button>
+
+//           )}
+
+
+//           {/* DIVIDER */}
+
+//           <span
+//             className={
+//               styles.actionDivider
+//             }
+//           />
+
+
+//           {/* ==================================================
+//               LANGUAGE
+//               ================================================== */}
+
+//           <div
+//             className={
+//               styles.langWrapper
+//             }
+
+//             ref={
+//               langRef
+//             }
+//           >
+
+//             <button
+//               type="button"
+
+//               className={
+//                 styles.iconBtn
+//               }
+
+//               onClick={() =>
+//                 setLangOpen(
+//                   previous =>
+//                     !previous
+//                 )
+//               }
+
+//               aria-label={
+//                 t(
+//                   "topbar.changeLanguage"
+//                 )
+//               }
+//             >
+
+//               <Globe
+//                 size={20}
+//                 strokeWidth={1.9}
+//               />
+
+
+//               <span
+//                 className={
+//                   styles.langIndicator
+//                 }
+//               >
+
+//                 {
+//                   currentLanguage.flag
+//                 }
+
+//               </span>
+
+//             </button>
+
+
+//             {langOpen && (
+
+//               <div
+//                 className={
+//                   styles.langDropdown
+//                 }
+//               >
+
+//                 <div
+//                   className={
+//                     styles.dropdownTitle
+//                   }
+//                 >
+
+//                   <div
+//                     className={
+//                       styles.dropdownTitleIcon
+//                     }
+//                   >
+
+//                     <Globe
+//                       size={17}
+//                     />
+
+//                   </div>
+
+
+//                   <div>
+
+//                     <p>
+
+//                       {t(
+//                         "topbar.selectLanguage"
+//                       )}
+
+//                     </p>
+
+
+//                     <span>
+
+//                       {t(
+//                         "topbar.choosePreferredLanguage"
+//                       )}
+
+//                     </span>
+
+//                   </div>
+
+//                 </div>
+
+
+//                 <div
+//                   className={
+//                     styles.langList
+//                   }
+//                 >
+
+//                   {languages.map(
+//                     lang => (
+
+//                       <button
+//                         type="button"
+
+//                         key={
+//                           lang.code
+//                         }
+
+//                         className={`
+//                           ${styles.langOption}
+//                           ${
+//                             i18n.language ===
+//                             lang.code
+//                               ? styles.langActive
+//                               : ""
+//                           }
+//                         `}
+
+//                         onClick={() =>
+//                           changeLanguage(
+//                             lang.code
+//                           )
+//                         }
+//                       >
+
+//                         <span
+//                           className={
+//                             styles.langFlag
+//                           }
+//                         >
+
+//                           {
+//                             lang.flag
+//                           }
+
+//                         </span>
+
+
+//                         <span
+//                           className={
+//                             styles.langLabel
+//                           }
+//                         >
+
+//                           {
+//                             lang.label
+//                           }
+
+//                         </span>
+
+
+//                         {i18n.language ===
+//                           lang.code && (
+
+//                           <Check
+//                             size={17}
+//                             className={
+//                               styles.langCheck
+//                             }
+//                           />
+
+//                         )}
+
+//                       </button>
+
+//                     )
+//                   )}
+
+//                 </div>
+
+//               </div>
+
+//             )}
+
+//           </div>
+
+
+//           {/* ==================================================
+//               CART
+//               ================================================== */}
+
+//           <button
+//             type="button"
+
+//             className={
+//               styles.cartBtn
+//             }
+
+//             onClick={
+//               openCart
+//             }
+
+//             aria-label={
+//               t(
+//                 "topbar.openCart"
+//               )
+//             }
+//           >
+
+//             <ShoppingCart
+//               size={20}
+//               strokeWidth={1.9}
+//             />
+
+
+//             {cartCount > 0 && (
+
+//               <span
+//                 className={
+//                   styles.cartBadge
+//                 }
+//               >
+
+//                 {
+//                   cartCount > 99
+//                     ? "99+"
+//                     : cartCount
+//                 }
+
+//               </span>
+
+//             )}
+
+//           </button>
+
+
+//           {/* ==================================================
+//               VERTICAL DIVIDER
+//               ================================================== */}
+
+//           <span
+//             className={
+//               styles.profileDivider
+//             }
+//           />
+
+
+//           {/* ==================================================
+//               PROFILE
+//               ================================================== */}
+
+//           <div
+//             className={
+//               styles.profileWrapper
+//             }
+
+//             ref={
+//               profileRef
+//             }
+//           >
+
+//             <button
+//               type="button"
+
+//               className={
+//                 styles.profileBtn
+//               }
+
+//               onClick={() =>
+//                 setProfileOpen(
+//                   previous =>
+//                     !previous
+//                 )
+//               }
+//             >
+
+//               <div
+//                 className={
+//                   styles.avatar
+//                 }
+//               >
+
+//                 {user?.name
+//                   ? user.name
+//                       .charAt(0)
+//                       .toUpperCase()
+//                   : (
+//                     <User
+//                       size={17}
+//                     />
+//                   )}
+
+//               </div>
+
+
+//               <div
+//                 className={
+//                   styles.profileInfo
+//                 }
+//               >
+
+//                 <span
+//                   className={
+//                     styles.profileName
+//                   }
+//                 >
+
+//                   {user?.name ||
+//                     t(
+//                       "topbar.farmer"
+//                     )}
+
+//                 </span>
+
+
+//                 <span
+//                   className={
+//                     styles.profileRole
+//                   }
+//                 >
+
+//                   {t(
+//                     "topbar.farmer"
+//                   )}
+
+//                 </span>
+
+//               </div>
+
+
+//               <ChevronDown
+//                 size={16}
+
+//                 className={
+//                   styles.profileChevron
+//                 }
+//               />
+
+//             </button>
+
+
+//             {/* ==================================================
+//                 PROFILE DROPDOWN
+//                 ================================================== */}
+
+//             {profileOpen && (
+
+//               <div
+//                 className={
+//                   styles.profileDropdown
+//                 }
+//               >
+
+//                 {/* Profile header */}
+
+//                 <div
+//                   className={
+//                     styles.profileHeader
+//                   }
+//                 >
+
+//                   <div
+//                     className={
+//                       styles.profileAvatar
+//                     }
+//                   >
+
+//                     {user?.name
+//                       ? user.name
+//                           .charAt(0)
+//                           .toUpperCase()
+//                       : (
+//                         <User
+//                           size={24}
+//                         />
+//                       )}
+
+//                   </div>
+
+
+//                   <div
+//                     className={
+//                       styles.profileHeaderInfo
+//                     }
+//                   >
+
+//                     <p
+//                       className={
+//                         styles.profileHeaderName
+//                       }
+//                     >
+
+//                       {user?.name ||
+//                         t(
+//                           "topbar.farmer"
+//                         )}
+
+//                     </p>
+
+
+//                     <p
+//                       className={
+//                         styles.profileHeaderRole
+//                       }
+//                     >
+
+//                       {t(
+//                         "topbar.farmerAccount"
+//                       )}
+
+//                     </p>
+
+//                   </div>
+
+//                 </div>
+
+
+//                 {/* My Profile */}
+
+//                 <Link
+//                   to="/profile"
+
+//                   className={
+//                     styles.dropdownItem
+//                   }
+
+//                   onClick={() =>
+//                     setProfileOpen(
+//                       false
+//                     )
+//                   }
+//                 >
+
+//                   <UserCircle
+//                     size={19}
+//                   />
+
+//                   <span>
+
+//                     {t(
+//                       "topbar.myProfile"
+//                     )}
+
+//                   </span>
+
+//                 </Link>
+
+
+//                 {/* Settings */}
+
+//                 <Link
+//                   to="/settings"
+
+//                   className={
+//                     styles.dropdownItem
+//                   }
+
+//                   onClick={() =>
+//                     setProfileOpen(
+//                       false
+//                     )
+//                   }
+//                 >
+
+//                   <Settings
+//                     size={19}
+//                   />
+
+//                   <span>
+
+//                     {t(
+//                       "topbar.settings"
+//                     )}
+
+//                   </span>
+
+//                 </Link>
+
+
+//                 {/* Guided Tour */}
+
+//                 <button
+//                   type="button"
+
+//                   onClick={
+//                     handleGuidedTour
+//                   }
+
+//                   className={
+//                     styles.dropdownItem
+//                   }
+//                 >
+
+//                   <HelpCircle
+//                     size={19}
+//                   />
+
+//                   <span>
+
+//                     {t(
+//                       "topbar.guidedTour"
+//                     )}
+
+//                   </span>
+
+//                 </button>
+
+
+//                 {/* Logout */}
+
+//                 <button
+//                   type="button"
+
+//                   onClick={
+//                     handleLogout
+//                   }
+
+//                   className={`
+//                     ${styles.dropdownItem}
+//                     ${styles.logoutItem}
+//                   `}
+//                 >
+
+//                   <LogOut
+//                     size={19}
+//                   />
+
+//                   <span>
+
+//                     {t(
+//                       "topbar.logout"
+//                     )}
+
+//                   </span>
+
+//                 </button>
+
+//               </div>
+
+//             )}
+
+//           </div>
+
+//         </div>
+
+//       </header>
+
+
+//       {/* ========================================================
+//           CART DRAWER
+//           ======================================================== */}
+
+//       <CartDrawer
+//         cart={cart}
+//         setCart={setCart}
+//         isOpen={cartOpen}
+
+//         onClose={() =>
+//           setCartOpen(false)
+//         }
+//       />
+
+//     </>
+
+//   );
+
+// };
+
+
+// export default DashboardTopbar;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // src/components/DashboardTopbar.jsx
 
 import React, {
@@ -3514,6 +4709,11 @@ import {
 
 import api from "../api";
 
+import {
+  getUserLanguage,
+  saveUserLanguage
+} from "../utils/userLanguage";
+
 import CartDrawer
   from "../pages/CartDrawer";
 
@@ -3544,20 +4744,40 @@ const DashboardTopbar = ({
     setProfileOpen
   ] = useState(false);
 
+
   const [
     langOpen,
     setLangOpen
   ] = useState(false);
+
 
   const [
     cartOpen,
     setCartOpen
   ] = useState(false);
 
+
   const [
     cart,
     setCart
   ] = useState([]);
+
+
+  // ==========================================================
+  // FORCE TOPBAR UPDATE
+  //
+  // react-i18next normally re-renders automatically.
+  // This state is only used for the language flag/checkmark.
+  // ==========================================================
+
+  const [
+    currentLanguageCode,
+    setCurrentLanguageCode
+  ] = useState(
+    i18n.resolvedLanguage ||
+    i18n.language ||
+    "en"
+  );
 
 
   // ==========================================================
@@ -3575,12 +4795,30 @@ const DashboardTopbar = ({
   // USER
   // ==========================================================
 
-  const user =
-    Cookies.get("user")
-      ? JSON.parse(
-          Cookies.get("user")
-        )
-      : null;
+  let user = null;
+
+  try {
+
+    const userCookie =
+      Cookies.get("user");
+
+    if (userCookie) {
+
+      user =
+        JSON.parse(
+          userCookie
+        );
+
+    }
+
+  } catch (error) {
+
+    console.error(
+      "Failed to parse user cookie:",
+      error
+    );
+
+  }
 
 
   // ==========================================================
@@ -3610,11 +4848,179 @@ const DashboardTopbar = ({
   ];
 
 
+  // ==========================================================
+  // SYNC WITH I18NEXT
+  //
+  // IMPORTANT:
+  // Do NOT use this listener for changing translations.
+  // useTranslation() handles that.
+  //
+  // This listener only keeps the Topbar flag/checkmark
+  // immediately synchronized.
+  // ==========================================================
+
+  useEffect(() => {
+
+    const handleLanguageChanged =
+      (language) => {
+
+        setCurrentLanguageCode(
+          language
+        );
+
+        document.documentElement.lang =
+          language;
+
+      };
+
+
+    if (
+      i18n &&
+      typeof i18n.on ===
+        "function"
+    ) {
+
+      i18n.on(
+        "languageChanged",
+        handleLanguageChanged
+      );
+
+    }
+
+
+    return () => {
+
+      if (
+        i18n &&
+        typeof i18n.off ===
+          "function"
+      ) {
+
+        i18n.off(
+          "languageChanged",
+          handleLanguageChanged
+        );
+
+      }
+
+    };
+
+  }, [
+    i18n
+  ]);
+
+
+  // ==========================================================
+  // LOAD CURRENT USER'S SAVED LANGUAGE
+  //
+  // This runs when this user's Dashboard loads.
+  // ==========================================================
+
+  useEffect(() => {
+
+    let cancelled =
+      false;
+
+
+    const loadUserLanguage =
+      async () => {
+
+        const savedLanguage =
+          getUserLanguage();
+
+
+        if (
+          !savedLanguage
+        ) {
+
+          return;
+
+        }
+
+
+        if (
+          savedLanguage ===
+          (
+            i18n.resolvedLanguage ||
+            i18n.language
+          )
+        ) {
+
+          if (
+            !cancelled
+          ) {
+
+            setCurrentLanguageCode(
+              savedLanguage
+            );
+
+            document.documentElement.lang =
+              savedLanguage;
+
+          }
+
+          return;
+
+        }
+
+
+        try {
+
+          await i18n.changeLanguage(
+            savedLanguage
+          );
+
+
+          if (
+            !cancelled
+          ) {
+
+            setCurrentLanguageCode(
+              savedLanguage
+            );
+
+            document.documentElement.lang =
+              savedLanguage;
+
+          }
+
+        } catch (error) {
+
+          console.error(
+            "Failed to load saved user language:",
+            error
+          );
+
+        }
+
+      };
+
+
+    loadUserLanguage();
+
+
+    return () => {
+
+      cancelled =
+        true;
+
+    };
+
+  }, []);
+
+
+  // ==========================================================
+  // CURRENT LANGUAGE
+  // ==========================================================
+
   const currentLanguage =
     languages.find(
       lang =>
-        lang.code ===
-        i18n.language
+        currentLanguageCode ===
+          lang.code ||
+        currentLanguageCode?.startsWith(
+          `${lang.code}-`
+        )
     ) || languages[0];
 
 
@@ -3642,6 +5048,7 @@ const DashboardTopbar = ({
             )
             .map(
               item => ({
+
                 _id:
                   item.productId._id,
 
@@ -3653,6 +5060,7 @@ const DashboardTopbar = ({
 
                 quantity:
                   item.quantity
+
               })
             );
 
@@ -3670,6 +5078,7 @@ const DashboardTopbar = ({
           "Failed to fetch cart:",
           error
         );
+
 
         return [];
 
@@ -3742,7 +5151,9 @@ const DashboardTopbar = ({
           )
         ) {
 
-          setProfileOpen(false);
+          setProfileOpen(
+            false
+          );
 
         }
 
@@ -3754,7 +5165,9 @@ const DashboardTopbar = ({
           )
         ) {
 
-          setLangOpen(false);
+          setLangOpen(
+            false
+          );
 
         }
 
@@ -3786,6 +5199,17 @@ const DashboardTopbar = ({
   const handleLogout =
     () => {
 
+      /*
+       * IMPORTANT:
+       *
+       * DO NOT use:
+       *
+       * localStorage.clear()
+       *
+       * because the user's language and onboarding state
+       * must remain after logout.
+       */
+
       Cookies.remove(
         "token"
       );
@@ -3794,6 +5218,7 @@ const DashboardTopbar = ({
         "user"
       );
 
+
       window.location.href =
         "/login";
 
@@ -3801,22 +5226,96 @@ const DashboardTopbar = ({
 
 
   // ==========================================================
-  // LANGUAGE
+  // LANGUAGE CHANGE
   // ==========================================================
 
   const changeLanguage =
-    async langCode => {
+    async (
+      langCode
+    ) => {
 
-      await i18n.changeLanguage(
-        langCode
-      );
+      try {
 
-      setLangOpen(false);
+        console.log(
+          "Changing language to:",
+          langCode
+        );
 
-      localStorage.setItem(
-        "preferred-language",
-        langCode
-      );
+
+        // ====================================================
+        // 1. CHANGE I18NEXT IMMEDIATELY
+        // ====================================================
+
+        await i18n.changeLanguage(
+          langCode
+        );
+
+
+        // ====================================================
+        // 2. UPDATE TOPBAR STATE IMMEDIATELY
+        // ====================================================
+
+        setCurrentLanguageCode(
+          langCode
+        );
+
+
+        // ====================================================
+        // 3. SAVE FOR CURRENT USER
+        // ====================================================
+
+        saveUserLanguage(
+          langCode
+        );
+
+
+        // ====================================================
+        // 4. UPDATE HTML LANGUAGE
+        // ====================================================
+
+        document.documentElement.lang =
+          langCode;
+
+
+        // ====================================================
+        // 5. OPTIONAL EVENT FOR OTHER CUSTOM COMPONENTS
+        // ====================================================
+
+        window.dispatchEvent(
+          new CustomEvent(
+            "farmxpert:languageChanged",
+            {
+              detail: {
+                language:
+                  langCode
+              }
+            }
+          )
+        );
+
+
+        // ====================================================
+        // 6. CLOSE DROPDOWN
+        // ====================================================
+
+        setLangOpen(
+          false
+        );
+
+
+        console.log(
+          "Current i18next language:",
+          i18n.language
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Failed to change language:",
+          error
+        );
+
+      }
 
     };
 
@@ -3828,19 +5327,14 @@ const DashboardTopbar = ({
   const handleGuidedTour =
     () => {
 
-      setProfileOpen(false);
-
-      localStorage.removeItem(
-        "farmxpert_tour_completed"
+      setProfileOpen(
+        false
       );
 
-      localStorage.removeItem(
-        "farmxpert_tour_skipped"
-      );
 
       window.dispatchEvent(
         new CustomEvent(
-          "start-guided-tour"
+          "farmxpert:start-guided-tour"
         )
       );
 
@@ -3858,7 +5352,9 @@ const DashboardTopbar = ({
         await fetchCart();
 
 
-      if (latestCart) {
+      if (
+        latestCart
+      ) {
 
         setCart(
           latestCart
@@ -3867,11 +5363,17 @@ const DashboardTopbar = ({
       }
 
 
-      setCartOpen(true);
+      setCartOpen(
+        true
+      );
 
-      setProfileOpen(false);
+      setProfileOpen(
+        false
+      );
 
-      setLangOpen(false);
+      setLangOpen(
+        false
+      );
 
     };
 
@@ -3899,7 +5401,8 @@ const DashboardTopbar = ({
   // ==========================================================
 
   const isAdmin =
-    user?.role === "admin";
+    user?.role ===
+    "admin";
 
 
   // ==========================================================
@@ -3910,9 +5413,9 @@ const DashboardTopbar = ({
 
     <>
 
-      {/* ======================================================
+      {/* ====================================================
           TOPBAR
-          ====================================================== */}
+          ==================================================== */}
 
       <header
         className={
@@ -3920,9 +5423,9 @@ const DashboardTopbar = ({
         }
       >
 
-        {/* ====================================================
-            LEFT SECTION
-            ==================================================== */}
+        {/* ==================================================
+            LEFT
+            ================================================== */}
 
         <div
           className={
@@ -3934,15 +5437,12 @@ const DashboardTopbar = ({
 
           <button
             type="button"
-
             onClick={
               onMenuClick
             }
-
             className={
               styles.menuBtn
             }
-
             aria-label={
               t(
                 "topbar.openMenu"
@@ -4015,9 +5515,9 @@ const DashboardTopbar = ({
         </div>
 
 
-        {/* ====================================================
-            RIGHT SECTION
-            ==================================================== */}
+        {/* ==================================================
+            RIGHT
+            ================================================== */}
 
         <div
           className={
@@ -4025,19 +5525,17 @@ const DashboardTopbar = ({
           }
         >
 
-          {/* ==================================================
+          {/* =================================================
               GUIDED TOUR
-              ================================================== */}
+              ================================================= */}
 
           {!isAdmin && (
 
             <button
               type="button"
-
               onClick={
                 handleGuidedTour
               }
-
               className={
                 styles.tourBtn
               }
@@ -4083,15 +5581,14 @@ const DashboardTopbar = ({
           />
 
 
-          {/* ==================================================
+          {/* =================================================
               LANGUAGE
-              ================================================== */}
+              ================================================= */}
 
           <div
             className={
               styles.langWrapper
             }
-
             ref={
               langRef
             }
@@ -4099,18 +5596,15 @@ const DashboardTopbar = ({
 
             <button
               type="button"
-
               className={
                 styles.iconBtn
               }
-
               onClick={() =>
                 setLangOpen(
                   previous =>
                     !previous
                 )
               }
-
               aria-label={
                 t(
                   "topbar.changeLanguage"
@@ -4138,6 +5632,8 @@ const DashboardTopbar = ({
 
             </button>
 
+
+            {/* LANGUAGE DROPDOWN */}
 
             {langOpen && (
 
@@ -4201,21 +5697,18 @@ const DashboardTopbar = ({
 
                       <button
                         type="button"
-
                         key={
                           lang.code
                         }
-
                         className={`
                           ${styles.langOption}
                           ${
-                            i18n.language ===
+                            currentLanguage.code ===
                             lang.code
                               ? styles.langActive
                               : ""
                           }
                         `}
-
                         onClick={() =>
                           changeLanguage(
                             lang.code
@@ -4249,17 +5742,19 @@ const DashboardTopbar = ({
                         </span>
 
 
-                        {i18n.language ===
-                          lang.code && (
+                        {
+                          currentLanguage.code ===
+                            lang.code && (
 
-                          <Check
-                            size={17}
-                            className={
-                              styles.langCheck
-                            }
-                          />
+                            <Check
+                              size={17}
+                              className={
+                                styles.langCheck
+                              }
+                            />
 
-                        )}
+                          )
+                        }
 
                       </button>
 
@@ -4275,21 +5770,18 @@ const DashboardTopbar = ({
           </div>
 
 
-          {/* ==================================================
+          {/* =================================================
               CART
-              ================================================== */}
+              ================================================= */}
 
           <button
             type="button"
-
             className={
               styles.cartBtn
             }
-
             onClick={
               openCart
             }
-
             aria-label={
               t(
                 "topbar.openCart"
@@ -4324,9 +5816,7 @@ const DashboardTopbar = ({
           </button>
 
 
-          {/* ==================================================
-              VERTICAL DIVIDER
-              ================================================== */}
+          {/* PROFILE DIVIDER */}
 
           <span
             className={
@@ -4335,15 +5825,14 @@ const DashboardTopbar = ({
           />
 
 
-          {/* ==================================================
+          {/* =================================================
               PROFILE
-              ================================================== */}
+              ================================================= */}
 
           <div
             className={
               styles.profileWrapper
             }
-
             ref={
               profileRef
             }
@@ -4351,11 +5840,9 @@ const DashboardTopbar = ({
 
             <button
               type="button"
-
               className={
                 styles.profileBtn
               }
-
               onClick={() =>
                 setProfileOpen(
                   previous =>
@@ -4370,15 +5857,17 @@ const DashboardTopbar = ({
                 }
               >
 
-                {user?.name
-                  ? user.name
-                      .charAt(0)
-                      .toUpperCase()
-                  : (
-                    <User
-                      size={17}
-                    />
-                  )}
+                {
+                  user?.name
+                    ? user.name
+                        .charAt(0)
+                        .toUpperCase()
+                    : (
+                      <User
+                        size={17}
+                      />
+                    )
+                }
 
               </div>
 
@@ -4395,10 +5884,12 @@ const DashboardTopbar = ({
                   }
                 >
 
-                  {user?.name ||
+                  {
+                    user?.name ||
                     t(
                       "topbar.farmer"
-                    )}
+                    )
+                  }
 
                 </span>
 
@@ -4420,7 +5911,6 @@ const DashboardTopbar = ({
 
               <ChevronDown
                 size={16}
-
                 className={
                   styles.profileChevron
                 }
@@ -4429,9 +5919,7 @@ const DashboardTopbar = ({
             </button>
 
 
-            {/* ==================================================
-                PROFILE DROPDOWN
-                ================================================== */}
+            {/* PROFILE DROPDOWN */}
 
             {profileOpen && (
 
@@ -4440,8 +5928,6 @@ const DashboardTopbar = ({
                   styles.profileDropdown
                 }
               >
-
-                {/* Profile header */}
 
                 <div
                   className={
@@ -4455,15 +5941,17 @@ const DashboardTopbar = ({
                     }
                   >
 
-                    {user?.name
-                      ? user.name
-                          .charAt(0)
-                          .toUpperCase()
-                      : (
-                        <User
-                          size={24}
-                        />
-                      )}
+                    {
+                      user?.name
+                        ? user.name
+                            .charAt(0)
+                            .toUpperCase()
+                        : (
+                          <User
+                            size={24}
+                          />
+                        )
+                    }
 
                   </div>
 
@@ -4480,10 +5968,12 @@ const DashboardTopbar = ({
                       }
                     >
 
-                      {user?.name ||
+                      {
+                        user?.name ||
                         t(
                           "topbar.farmer"
-                        )}
+                        )
+                      }
 
                     </p>
 
@@ -4505,15 +5995,13 @@ const DashboardTopbar = ({
                 </div>
 
 
-                {/* My Profile */}
+                {/* MY PROFILE */}
 
                 <Link
                   to="/profile"
-
                   className={
                     styles.dropdownItem
                   }
-
                   onClick={() =>
                     setProfileOpen(
                       false
@@ -4536,15 +6024,13 @@ const DashboardTopbar = ({
                 </Link>
 
 
-                {/* Settings */}
+                {/* SETTINGS */}
 
                 <Link
                   to="/settings"
-
                   className={
                     styles.dropdownItem
                   }
-
                   onClick={() =>
                     setProfileOpen(
                       false
@@ -4567,15 +6053,13 @@ const DashboardTopbar = ({
                 </Link>
 
 
-                {/* Guided Tour */}
+                {/* GUIDED TOUR */}
 
                 <button
                   type="button"
-
                   onClick={
                     handleGuidedTour
                   }
-
                   className={
                     styles.dropdownItem
                   }
@@ -4596,15 +6080,13 @@ const DashboardTopbar = ({
                 </button>
 
 
-                {/* Logout */}
+                {/* LOGOUT */}
 
                 <button
                   type="button"
-
                   onClick={
                     handleLogout
                   }
-
                   className={`
                     ${styles.dropdownItem}
                     ${styles.logoutItem}
@@ -4636,17 +6118,24 @@ const DashboardTopbar = ({
       </header>
 
 
-      {/* ========================================================
+      {/* ======================================================
           CART DRAWER
-          ======================================================== */}
+          ====================================================== */}
 
       <CartDrawer
-        cart={cart}
-        setCart={setCart}
-        isOpen={cartOpen}
-
+        cart={
+          cart
+        }
+        setCart={
+          setCart
+        }
+        isOpen={
+          cartOpen
+        }
         onClose={() =>
-          setCartOpen(false)
+          setCartOpen(
+            false
+          )
         }
       />
 

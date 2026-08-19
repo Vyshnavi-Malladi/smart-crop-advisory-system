@@ -17980,9 +17980,10 @@ export default function Dashboard() {
      ========================================================= */
 
   const farmerName =
-    farmerProfile?.fullName ||
-    farmerProfile?.name ||
-    "Vyshnavi";
+  farmerProfile?.fullName ||
+  farmerProfile?.name ||
+  farmerProfile?.firstName ||
+  "Farmer";
 
 
   const stages = [

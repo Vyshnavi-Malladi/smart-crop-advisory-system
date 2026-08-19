@@ -1063,5 +1063,82 @@
   "profile_saved": "Profile saved successfully.",
   "profile_save_failed": "Failed to save profile.",
   "loading_profile": "Loading profile...",
-  "please_fill_all_required_fields": "Please fill all required fields."
+  "please_fill_all_required_fields": "Please fill all required fields.",
+  "guidedTour": {
+    "welcome": {
+      "title": "Welcome to FarmXpert! 👋",
+      "description": "Let's take a quick tour to help you get started.",
+      "imageAlt": "Farmer",
+      "features": {
+        "dashboard": "Dashboard Overview",
+        "smartTools": "Smart Farm Tools",
+        "manageFarm": "Manage Your Farm",
+        "expertInsights": "Get Expert Insights"
+      }
+    },
+
+    "steps": {
+      "dashboard": {
+        "title": "📊 This is your Dashboard",
+        "description": "Here you can see an overview of your farm, weather, crop status, and important alerts."
+      },
+
+      "weather": {
+        "title": "🌤️ Weather Information",
+        "description": "Check real-time weather updates and forecasts to plan your farming activities."
+      },
+
+      "cropTracker": {
+        "title": "🌱 Crop Tracker",
+        "description": "Track your crop growth stage and days passed to take timely farming actions."
+      },
+
+      "cropConsult": {
+        "title": "🌱 Crop Consult",
+        "description": "Get AI-based crop recommendations based on your soil and environmental conditions."
+      },
+
+      "yieldForecast": {
+        "title": "📈 Yield Forecast",
+        "description": "Estimate your harvest yield based on your crop type, land area, and available data."
+      },
+
+      "diseaseLab": {
+        "title": "🔬 Disease Lab",
+        "description": "Upload a leaf image to detect diseases early and get suggested solutions."
+      },
+
+      "soilTesting": {
+        "title": "🧪 Soil Testing",
+        "description": "Find nearby soil testing centers and get expert analysis for better crop planning."
+      },
+
+      "farmStore": {
+        "title": "🛒 Farm Store",
+        "description": "Buy quality seeds, fertilizers, and other farming products easily."
+      }
+    },
+
+    "complete": {
+      "title": "You're All Set! 🎉",
+      "description": "You now know the main tools of FarmXpert.",
+      "happyFarming": "Happy Farming!"
+    },
+
+    "buttons": {
+      "startTour": "Start Tour",
+      "skipForNow": "Skip for now",
+      "back": "Back",
+      "skip": "Skip",
+      "next": "Next",
+      "exploreDashboard": "Explore Dashboard"
+    }
+  },
+  "languageSelection": {
+  "title": "Choose Your Language",
+  "description": "Please select your preferred language to continue.",
+  "english": "English",
+  "telugu": "Telugu",
+  "hindi": "Hindi"
+}
 }

@@ -3437,6 +3437,2106 @@
 
 
 
+// // src/pages/Profile.jsx
+
+// import { useEffect, useState } from "react";
+// import { motion } from "framer-motion";
+
+// import {
+//   User,
+//   Phone,
+//   MapPin,
+//   Sprout,
+//   Tractor,
+//   Edit3,
+//   Calendar,
+//   Droplets,
+//   Mountain,
+//   ArrowLeft,
+//   Globe,
+//   Landmark,
+//   Home,
+//   Building2,
+//   Save,
+//   X,
+//   Loader2,
+// } from "lucide-react";
+
+// import { useNavigate } from "react-router-dom";
+// import { useTranslation } from "react-i18next";
+// import { toast } from "react-toastify";
+
+// import api from "../api";
+
+// export default function Profile() {
+//   const navigate = useNavigate();
+//   const { t, i18n } = useTranslation();
+
+//   const [profile, setProfile] = useState(null);
+//   const [originalProfile, setOriginalProfile] = useState(null);
+
+//   const [loading, setLoading] = useState(true);
+//   const [saving, setSaving] = useState(false);
+//   const [editMode, setEditMode] = useState(false);
+
+//   /* =========================================================
+//      FETCH PROFILE
+//   ========================================================= */
+
+//   useEffect(() => {
+//     fetchProfile();
+//   }, []);
+
+//   const fetchProfile = async () => {
+//     try {
+//       setLoading(true);
+
+//       const res = await api.get("/farmer");
+
+//       if (res.data.exists) {
+//         const loadedProfile = res.data.profile;
+
+//         setProfile(loadedProfile);
+//         setOriginalProfile(loadedProfile);
+
+//         if (
+//           loadedProfile.language &&
+//           loadedProfile.language !== i18n.language
+//         ) {
+//           await i18n.changeLanguage(loadedProfile.language);
+//         }
+//       }
+//     } catch (err) {
+//       console.error("Error fetching profile:", err);
+
+//       toast.error(
+//         t("profile_load_failed") || "Unable to load profile"
+//       );
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   /* =========================================================
+//      HANDLE INPUT CHANGE
+//   ========================================================= */
+
+//   const handleChange = (e) => {
+//     const { name, value } = e.target;
+
+//     setProfile((prev) => ({
+//       ...prev,
+//       [name]: value,
+//     }));
+//   };
+
+//   /* =========================================================
+//      EDIT PROFILE
+//   ========================================================= */
+
+//   const handleEdit = () => {
+//     setOriginalProfile({
+//       ...profile,
+//     });
+
+//     setEditMode(true);
+//   };
+
+//   /* =========================================================
+//      CANCEL EDIT
+//   ========================================================= */
+
+//   const handleCancel = () => {
+//     setProfile({
+//       ...originalProfile,
+//     });
+
+//     setEditMode(false);
+//   };
+
+//   /* =========================================================
+//      SAVE PROFILE
+//   ========================================================= */
+
+//   const handleSave = async () => {
+//     try {
+//       setSaving(true);
+
+//       if (!profile.fullName?.trim()) {
+//         toast.error(
+//           t("please_fill_required_fields") ||
+//             "Please enter your full name"
+//         );
+
+//         setSaving(false);
+//         return;
+//       }
+
+//       if (!profile.mobile?.trim()) {
+//         toast.error("Please enter your mobile number");
+
+//         setSaving(false);
+//         return;
+//       }
+
+//       if (!profile.farmName?.trim()) {
+//         toast.error("Please enter your farm name");
+
+//         setSaving(false);
+//         return;
+//       }
+
+//       if (!profile.primaryCrop?.trim()) {
+//         toast.error("Please enter your primary crop");
+
+//         setSaving(false);
+//         return;
+//       }
+
+//       if (!profile.state?.trim() || !profile.district?.trim()) {
+//         toast.error("Please enter your location details");
+
+//         setSaving(false);
+//         return;
+//       }
+
+//       const updatedProfile = {
+//         ...profile,
+//         language: profile.language || i18n.language,
+//       };
+
+//       const response = await api.post(
+//         "/farmer",
+//         updatedProfile
+//       );
+
+//       const savedProfile =
+//         response.data?.profile || updatedProfile;
+
+//       setProfile(savedProfile);
+//       setOriginalProfile(savedProfile);
+
+//       setEditMode(false);
+
+//       if (
+//         savedProfile.language &&
+//         savedProfile.language !== i18n.language
+//       ) {
+//         await i18n.changeLanguage(savedProfile.language);
+//       }
+
+//       toast.success(
+//         t("profile_saved") ||
+//           "Profile updated successfully"
+//       );
+//     } catch (err) {
+//       console.error("Profile update error:", err);
+
+//       toast.error(
+//         err.response?.data?.error ||
+//           t("profile_save_failed") ||
+//           "Failed to update profile"
+//       );
+//     } finally {
+//       setSaving(false);
+//     }
+//   };
+
+//   /* =========================================================
+//      LOADING
+//   ========================================================= */
+
+//   if (loading) {
+//     return (
+//       <div className="min-h-screen bg-[#f3f6f4] flex items-center justify-center">
+//         <div className="text-center">
+//           <div
+//             className="
+//               w-10
+//               h-10
+//               mx-auto
+//               border-[3px]
+//               border-[#dce5df]
+//               border-t-[#08753d]
+//               rounded-full
+//               animate-spin
+//             "
+//           />
+
+//           <p
+//             className="
+//               mt-4
+//               text-[15px]
+//               font-medium
+//               text-[#687771]
+//             "
+//           >
+//             {t("loading_profile") || "Loading profile..."}
+//           </p>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   /* =========================================================
+//      NO PROFILE
+//   ========================================================= */
+
+//   if (!profile) {
+//     return (
+//       <div
+//         className="
+//           min-h-screen
+//           bg-[#f3f6f4]
+//           flex
+//           items-center
+//           justify-center
+//           px-5
+//         "
+//       >
+//         <div
+//           className="
+//             w-full
+//             max-w-[430px]
+//             bg-white
+//             rounded-[22px]
+//             border
+//             border-[#e0e7e3]
+//             shadow-[0_12px_35px_rgba(26,47,38,0.08)]
+//             p-10
+//             text-center
+//           "
+//         >
+//           <div
+//             className="
+//               w-16
+//               h-16
+//               mx-auto
+//               rounded-2xl
+//               bg-[#edf2ef]
+//               text-[#08753d]
+//               flex
+//               items-center
+//               justify-center
+//             "
+//           >
+//             <User size={27} strokeWidth={1.7} />
+//           </div>
+
+//           <h2
+//             className="
+//               mt-5
+//               text-[24px]
+//               font-bold
+//               text-[#20332a]
+//             "
+//           >
+//             {t("profile_title") || "Your Profile"}
+//           </h2>
+
+//           <p
+//             className="
+//               mt-2
+//               text-[14px]
+//               leading-6
+//               text-[#71807a]
+//             "
+//           >
+//             Create your farmer profile to manage
+//             your information.
+//           </p>
+
+//           <button
+//             onClick={() => navigate("/farmer-profile")}
+//             className="
+//               mt-7
+//               h-[45px]
+//               px-7
+//               rounded-xl
+//               bg-[#08753d]
+//               text-white
+//               text-[14px]
+//               font-semibold
+//               hover:bg-[#056634]
+//               transition
+//             "
+//           >
+//             {t("edit_profile") || "Create Profile"}
+//           </button>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   /* =========================================================
+//      LANGUAGE
+//   ========================================================= */
+
+//   const languageName =
+//     i18n.language === "te"
+//       ? "తెలుగు"
+//       : i18n.language === "hi"
+//       ? "हिंदी"
+//       : "English";
+
+//   /* =========================================================
+//      MAP
+//   ========================================================= */
+
+//   const mapLat =
+//     Number(profile.latitude) || 16.9891;
+
+//   const mapLng =
+//     Number(profile.longitude) || 82.2475;
+
+//   const mapDelta = 0.08;
+
+//   const mapUrl =
+//     `https://www.openstreetmap.org/export/embed.html?bbox=` +
+//     `${mapLng - mapDelta}%2C${mapLat - mapDelta}%2C` +
+//     `${mapLng + mapDelta}%2C${mapLat + mapDelta}` +
+//     `&layer=mapnik&marker=${mapLat}%2C${mapLng}`;
+
+//   return (
+//     <div
+//       className="
+//         min-h-screen
+//         bg-[#f3f6f4]
+//         px-4
+//         sm:px-5
+//         lg:px-7
+//         py-6
+//         lg:py-7
+//       "
+//     >
+//       <div className="max-w-[1295px] mx-auto">
+
+//         {/* =====================================================
+//             PROFILE HEADER
+//         ===================================================== */}
+
+//         <motion.section
+//           initial={{
+//             opacity: 0,
+//             y: 12,
+//           }}
+//           animate={{
+//             opacity: 1,
+//             y: 0,
+//           }}
+//           transition={{
+//             duration: 0.45,
+//             ease: "easeOut",
+//           }}
+//           className="
+//             relative
+//             min-h-[215px]
+//             overflow-hidden
+//             rounded-[22px]
+//             border
+//             border-[#086c3a]
+//             shadow-[0_12px_30px_rgba(5,78,43,0.18)]
+//           "
+//           style={{
+//             background:
+//               "linear-gradient(105deg, #056b37 0%, #08753d 48%, #0b8647 100%)",
+//           }}
+//         >
+
+//           {/* =================================================
+//               SUBTLE HEADER HIGHLIGHTS
+//           ================================================= */}
+
+//           <div
+//             className="
+//               absolute
+//               -right-[100px]
+//               -top-[180px]
+//               w-[430px]
+//               h-[430px]
+//               rounded-full
+//               bg-white/[0.035]
+//               pointer-events-none
+//             "
+//           />
+
+//           <div
+//             className="
+//               absolute
+//               right-[80px]
+//               -bottom-[230px]
+//               w-[400px]
+//               h-[400px]
+//               rounded-full
+//               border
+//               border-white/[0.035]
+//               pointer-events-none
+//             "
+//           />
+
+//           <div
+//             className="
+//               absolute
+//               left-[38%]
+//               -bottom-[200px]
+//               w-[370px]
+//               h-[370px]
+//               rounded-full
+//               bg-black/[0.035]
+//               pointer-events-none
+//             "
+//           />
+
+//           {/* =================================================
+//               HEADER CONTENT
+//           ================================================= */}
+
+//           <div
+//             className="
+//               relative
+//               z-10
+//               min-h-[215px]
+//               px-6
+//               sm:px-8
+//               lg:px-[70px]
+//               py-7
+//               flex
+//               flex-col
+//               lg:flex-row
+//               items-center
+//               justify-between
+//               gap-7
+//             "
+//           >
+
+//             {/* =================================================
+//                 PROFILE IDENTITY
+//             ================================================= */}
+
+//             <div
+//               className="
+//                 flex
+//                 items-center
+//                 gap-5
+//                 sm:gap-6
+//                 w-full
+//                 lg:w-auto
+//               "
+//             >
+
+//               {/* AVATAR */}
+
+//               <div className="relative shrink-0">
+
+//                 <div
+//                   className="
+//                     absolute
+//                     -inset-[5px]
+//                     rounded-full
+//                     border
+//                     border-white/20
+//                   "
+//                 />
+
+//                 <div
+//                   className="
+//                     relative
+//                     w-[92px]
+//                     h-[92px]
+//                     sm:w-[108px]
+//                     sm:h-[108px]
+//                     rounded-full
+
+//                     bg-white/[0.08]
+//                     backdrop-blur-sm
+
+//                     border
+//                     border-white/65
+
+//                     flex
+//                     items-center
+//                     justify-center
+
+//                     text-[39px]
+//                     sm:text-[46px]
+//                     font-bold
+//                     text-white
+
+//                     shadow-[0_8px_24px_rgba(0,0,0,0.16)]
+//                   "
+//                 >
+//                   {profile.fullName
+//                     ? profile.fullName
+//                         .charAt(0)
+//                         .toUpperCase()
+//                     : "F"}
+//                 </div>
+
+//               </div>
+
+//               {/* NAME */}
+
+//               <div className="min-w-0">
+
+//                 {editMode ? (
+//                   <input
+//                     type="text"
+//                     name="fullName"
+//                     value={profile.fullName || ""}
+//                     onChange={handleChange}
+//                     className="
+//                       w-full
+//                       max-w-[360px]
+//                       h-[46px]
+//                       px-4
+//                       rounded-xl
+
+//                       bg-white/[0.10]
+//                       border
+//                       border-white/30
+
+//                       text-[24px]
+//                       sm:text-[28px]
+//                       font-bold
+//                       text-white
+
+//                       outline-none
+
+//                       placeholder:text-white/50
+
+//                       focus:border-white/55
+//                       focus:bg-white/[0.13]
+//                     "
+//                   />
+//                 ) : (
+//                   <h1
+//                     className="
+//                       text-[29px]
+//                       sm:text-[33px]
+//                       lg:text-[35px]
+
+//                       leading-[1.12]
+
+//                       font-bold
+//                       tracking-[-0.7px]
+
+//                       text-white
+//                     "
+//                   >
+//                     {profile.fullName || "--"}
+//                   </h1>
+//                 )}
+
+//                 <div
+//                   className="
+//                     flex
+//                     items-center
+//                     gap-2
+//                     mt-2.5
+//                   "
+//                 >
+//                   <span
+//                     className="
+//                       w-[7px]
+//                       h-[7px]
+//                       rounded-full
+//                       bg-[#c4e8d3]
+//                       shadow-[0_0_8px_rgba(196,232,211,0.35)]
+//                     "
+//                   />
+
+//                   <p
+//                     className="
+//                       text-[14px]
+//                       sm:text-[15px]
+//                       text-[#e0f0e7]
+//                       font-medium
+//                     "
+//                   >
+//                     {t("smart_farmer") ||
+//                       "Smart Farmer"}
+//                   </p>
+//                 </div>
+
+//               </div>
+
+//             </div>
+
+
+//             {/* =================================================
+//                 ACTION BUTTONS
+//             ================================================= */}
+
+//             <div
+//               className="
+//                 flex
+//                 items-center
+//                 justify-end
+//                 gap-3
+//                 w-full
+//                 lg:w-auto
+//                 shrink-0
+//               "
+//             >
+
+//               {!editMode ? (
+//                 <>
+//                   {/* DASHBOARD */}
+
+//                   <button
+//                     type="button"
+//                     onClick={() =>
+//                       navigate("/dashboard")
+//                     }
+//                     className="
+//                       group
+
+//                       h-[46px]
+//                       min-w-[124px]
+//                       px-[18px]
+
+//                       rounded-[11px]
+
+//                       bg-white
+//                       border
+//                       border-white
+
+//                       text-[#08753d]
+//                       text-[14px]
+//                       font-semibold
+
+//                       flex
+//                       items-center
+//                       justify-center
+//                       gap-2
+
+//                       shadow-[0_5px_15px_rgba(0,0,0,0.13)]
+
+//                       transition-all
+//                       duration-200
+
+//                       hover:bg-[#f7faf8]
+//                       hover:-translate-y-[1px]
+//                       hover:shadow-[0_7px_18px_rgba(0,0,0,0.16)]
+
+//                       active:translate-y-0
+
+//                       focus:outline-none
+//                       focus:ring-2
+//                       focus:ring-white/40
+//                     "
+//                   >
+//                     <ArrowLeft
+//                       size={17}
+//                       strokeWidth={2.2}
+//                       className="
+//                         transition-transform
+//                         duration-200
+//                         group-hover:-translate-x-[2px]
+//                       "
+//                     />
+
+//                     <span className="whitespace-nowrap">
+//                       {t("nav_dashboard") ||
+//                         "Dashboard"}
+//                     </span>
+//                   </button>
+
+
+//                   {/* EDIT PROFILE */}
+
+//                   <button
+//                     type="button"
+//                     onClick={handleEdit}
+//                     className="
+//                       group
+
+//                       h-[46px]
+//                       min-w-[132px]
+//                       px-[18px]
+
+//                       rounded-[11px]
+
+//                       bg-white/[0.08]
+//                       border
+//                       border-white/45
+
+//                       text-white
+//                       text-[14px]
+//                       font-semibold
+
+//                       flex
+//                       items-center
+//                       justify-center
+//                       gap-2
+
+//                       backdrop-blur-sm
+
+//                       shadow-[0_4px_14px_rgba(0,0,0,0.07)]
+
+//                       transition-all
+//                       duration-200
+
+//                       hover:bg-white/[0.15]
+//                       hover:border-white/65
+//                       hover:-translate-y-[1px]
+//                       hover:shadow-[0_7px_18px_rgba(0,0,0,0.12)]
+
+//                       active:translate-y-0
+
+//                       focus:outline-none
+//                       focus:ring-2
+//                       focus:ring-white/30
+//                     "
+//                   >
+//                     <Edit3
+//                       size={17}
+//                       strokeWidth={2}
+//                       className="
+//                         transition-transform
+//                         duration-200
+//                         group-hover:scale-[1.04]
+//                       "
+//                     />
+
+//                     <span className="whitespace-nowrap">
+//                       {t("edit_profile") ||
+//                         "Edit Profile"}
+//                     </span>
+//                   </button>
+//                 </>
+//               ) : (
+//                 <>
+//                   {/* CANCEL */}
+
+//                   <button
+//                     type="button"
+//                     onClick={handleCancel}
+//                     disabled={saving}
+//                     className="
+//                       h-[46px]
+//                       min-w-[100px]
+//                       px-[18px]
+
+//                       rounded-[11px]
+
+//                       bg-white
+//                       border
+//                       border-white
+
+//                       text-[#40534a]
+//                       text-[14px]
+//                       font-semibold
+
+//                       flex
+//                       items-center
+//                       justify-center
+//                       gap-2
+
+//                       shadow-[0_5px_15px_rgba(0,0,0,0.12)]
+
+//                       transition-all
+//                       duration-200
+
+//                       hover:bg-[#f7f9f8]
+//                       hover:-translate-y-[1px]
+
+//                       active:translate-y-0
+
+//                       disabled:opacity-50
+//                       disabled:cursor-not-allowed
+
+//                       focus:outline-none
+//                     "
+//                   >
+//                     <X
+//                       size={17}
+//                       strokeWidth={2.1}
+//                     />
+
+//                     <span>
+//                       Cancel
+//                     </span>
+//                   </button>
+
+
+//                   {/* SAVE */}
+
+//                   <button
+//                     type="button"
+//                     onClick={handleSave}
+//                     disabled={saving}
+//                     className="
+//                       group
+
+//                       h-[46px]
+//                       min-w-[138px]
+//                       px-[18px]
+
+//                       rounded-[11px]
+
+//                       bg-[#eaf4ee]
+//                       border
+//                       border-white/70
+
+//                       text-[#08753d]
+//                       text-[14px]
+//                       font-semibold
+
+//                       flex
+//                       items-center
+//                       justify-center
+//                       gap-2
+
+//                       shadow-[0_5px_15px_rgba(0,0,0,0.10)]
+
+//                       transition-all
+//                       duration-200
+
+//                       hover:bg-white
+//                       hover:-translate-y-[1px]
+//                       hover:shadow-[0_7px_18px_rgba(0,0,0,0.13)]
+
+//                       active:translate-y-0
+
+//                       disabled:opacity-50
+//                       disabled:cursor-not-allowed
+
+//                       focus:outline-none
+//                     "
+//                   >
+//                     {saving ? (
+//                       <Loader2
+//                         size={17}
+//                         className="animate-spin"
+//                       />
+//                     ) : (
+//                       <Save
+//                         size={17}
+//                         strokeWidth={2.1}
+//                       />
+//                     )}
+
+//                     <span className="whitespace-nowrap">
+//                       {saving
+//                         ? "Saving..."
+//                         : "Save Changes"}
+//                     </span>
+//                   </button>
+//                 </>
+//               )}
+
+//             </div>
+
+//           </div>
+//         </motion.section>
+
+
+//         {/* =====================================================
+//             PERSONAL + FARM INFORMATION
+//         ===================================================== */}
+
+//         <div
+//           className="
+//             grid
+//             lg:grid-cols-2
+//             gap-5
+//             mt-6
+//           "
+//         >
+
+//           {/* PERSONAL INFORMATION */}
+
+//           <motion.section
+//             initial={{
+//               opacity: 0,
+//               x: -12,
+//             }}
+//             animate={{
+//               opacity: 1,
+//               x: 0,
+//             }}
+//             transition={{
+//               duration: 0.4,
+//             }}
+//             className="
+//               bg-white
+//               min-h-[390px]
+//               rounded-[20px]
+//               border
+//               border-[#e0e7e3]
+//               shadow-[0_7px_25px_rgba(30,57,45,0.055)]
+//               px-6
+//               sm:px-7
+//               pt-6
+//               pb-5
+//             "
+//           >
+
+//             <CardHeader
+//               icon={<User size={21} />}
+//               title={
+//                 t("personal_information") ||
+//                 "Personal Information"
+//               }
+//               subtitle={
+//                 t("personal_information_desc") ||
+//                 "Basic details about the farmer"
+//               }
+//             />
+
+//             <div className="mt-4">
+
+//               {editMode ? (
+//                 <>
+//                   <EditRow
+//                     icon={<User size={17} />}
+//                     label={
+//                       t("full_name") ||
+//                       "Full Name"
+//                     }
+//                   >
+//                     <StyledInput
+//                       type="text"
+//                       name="fullName"
+//                       value={profile.fullName || ""}
+//                       onChange={handleChange}
+//                     />
+//                   </EditRow>
+
+//                   <EditRow
+//                     icon={<Phone size={17} />}
+//                     label={
+//                       t("mobile_number") ||
+//                       "Mobile Number"
+//                     }
+//                   >
+//                     <StyledInput
+//                       type="text"
+//                       name="mobile"
+//                       value={profile.mobile || ""}
+//                       onChange={handleChange}
+//                     />
+//                   </EditRow>
+
+//                   <EditRow
+//                     icon={<Calendar size={17} />}
+//                     label={
+//                       t("age") || "Age"
+//                     }
+//                   >
+//                     <StyledInput
+//                       type="number"
+//                       name="age"
+//                       value={profile.age || ""}
+//                       onChange={handleChange}
+//                     />
+//                   </EditRow>
+
+//                   <EditRow
+//                     icon={<User size={17} />}
+//                     label={
+//                       t("gender") ||
+//                       "Gender"
+//                     }
+//                   >
+//                     <StyledSelect
+//                       name="gender"
+//                       value={profile.gender || ""}
+//                       onChange={handleChange}
+//                     >
+//                       <option value="">
+//                         Select Gender
+//                       </option>
+
+//                       <option value="Male">
+//                         Male
+//                       </option>
+
+//                       <option value="Female">
+//                         Female
+//                       </option>
+
+//                       <option value="Other">
+//                         Other
+//                       </option>
+//                     </StyledSelect>
+//                   </EditRow>
+
+//                   <EditRow
+//                     icon={<Globe size={17} />}
+//                     label={
+//                       t("current_language") ||
+//                       "Current Language"
+//                     }
+//                     last
+//                   >
+//                     <StyledSelect
+//                       name="language"
+//                       value={
+//                         profile.language ||
+//                         i18n.language
+//                       }
+//                       onChange={handleChange}
+//                     >
+//                       <option value="en">
+//                         English
+//                       </option>
+
+//                       <option value="te">
+//                         తెలుగు
+//                       </option>
+
+//                       <option value="hi">
+//                         हिंदी
+//                       </option>
+//                     </StyledSelect>
+//                   </EditRow>
+//                 </>
+//               ) : (
+//                 <>
+//                   <ProfileRow
+//                     icon={<User size={17} />}
+//                     label={
+//                       t("full_name") ||
+//                       "Full Name"
+//                     }
+//                     value={profile.fullName}
+//                   />
+
+//                   <ProfileRow
+//                     icon={<Phone size={17} />}
+//                     label={
+//                       t("mobile_number") ||
+//                       "Mobile Number"
+//                     }
+//                     value={profile.mobile}
+//                   />
+
+//                   <ProfileRow
+//                     icon={<Calendar size={17} />}
+//                     label={t("age") || "Age"}
+//                     value={profile.age}
+//                   />
+
+//                   <ProfileRow
+//                     icon={<User size={17} />}
+//                     label={
+//                       t("gender") ||
+//                       "Gender"
+//                     }
+//                     value={profile.gender}
+//                   />
+
+//                   <ProfileRow
+//                     icon={<Globe size={17} />}
+//                     label={
+//                       t("current_language") ||
+//                       "Current Language"
+//                     }
+//                     value={languageName}
+//                     last
+//                   />
+//                 </>
+//               )}
+
+//             </div>
+
+//           </motion.section>
+
+
+//           {/* FARM INFORMATION */}
+
+//           <motion.section
+//             initial={{
+//               opacity: 0,
+//               x: 12,
+//             }}
+//             animate={{
+//               opacity: 1,
+//               x: 0,
+//             }}
+//             transition={{
+//               duration: 0.4,
+//             }}
+//             className="
+//               bg-white
+//               min-h-[390px]
+//               rounded-[20px]
+//               border
+//               border-[#e0e7e3]
+//               shadow-[0_7px_25px_rgba(30,57,45,0.055)]
+//               px-6
+//               sm:px-7
+//               pt-6
+//               pb-5
+//             "
+//           >
+
+//             <CardHeader
+//               icon={<Tractor size={21} />}
+//               title={
+//                 t("farm_information") ||
+//                 "Farm Information"
+//               }
+//               subtitle={
+//                 t("farm_information_desc") ||
+//                 "Tell us about your farm"
+//               }
+//             />
+
+//             <div
+//               className="
+//                 grid
+//                 grid-cols-1
+//                 sm:grid-cols-2
+//                 gap-x-7
+//                 mt-4
+//               "
+//             >
+
+//               {/* LEFT */}
+
+//               <div>
+
+//                 {editMode ? (
+//                   <>
+//                     <EditRow
+//                       icon={<Tractor size={17} />}
+//                       label={
+//                         t("farm_name") ||
+//                         "Farm Name"
+//                       }
+//                     >
+//                       <StyledInput
+//                         type="text"
+//                         name="farmName"
+//                         value={
+//                           profile.farmName || ""
+//                         }
+//                         onChange={handleChange}
+//                       />
+//                     </EditRow>
+
+//                     <EditRow
+//                       icon={<Sprout size={17} />}
+//                       label={
+//                         t("primary_crop") ||
+//                         "Primary Crop"
+//                       }
+//                     >
+//                       <StyledInput
+//                         type="text"
+//                         name="primaryCrop"
+//                         value={
+//                           profile.primaryCrop || ""
+//                         }
+//                         onChange={handleChange}
+//                       />
+//                     </EditRow>
+
+//                     <EditRow
+//                       icon={<Sprout size={17} />}
+//                       label={
+//                         t("secondary_crop") ||
+//                         "Secondary Crop"
+//                       }
+//                     >
+//                       <StyledInput
+//                         type="text"
+//                         name="secondaryCrop"
+//                         value={
+//                           profile.secondaryCrop || ""
+//                         }
+//                         onChange={handleChange}
+//                       />
+//                     </EditRow>
+
+//                     <EditRow
+//                       icon={<Mountain size={17} />}
+//                       label={
+//                         t("soil_type") ||
+//                         "Soil Type"
+//                       }
+//                       last
+//                     >
+//                       <StyledInput
+//                         type="text"
+//                         name="soilType"
+//                         value={
+//                           profile.soilType || ""
+//                         }
+//                         onChange={handleChange}
+//                       />
+//                     </EditRow>
+//                   </>
+//                 ) : (
+//                   <>
+//                     <ProfileRow
+//                       icon={<Tractor size={17} />}
+//                       label={
+//                         t("farm_name") ||
+//                         "Farm Name"
+//                       }
+//                       value={
+//                         profile.farmName
+//                       }
+//                     />
+
+//                     <ProfileRow
+//                       icon={<Sprout size={17} />}
+//                       label={
+//                         t("primary_crop") ||
+//                         "Primary Crop"
+//                       }
+//                       value={
+//                         profile.primaryCrop
+//                       }
+//                     />
+
+//                     <ProfileRow
+//                       icon={<Sprout size={17} />}
+//                       label={
+//                         t("secondary_crop") ||
+//                         "Secondary Crop"
+//                       }
+//                       value={
+//                         profile.secondaryCrop
+//                       }
+//                     />
+
+//                     <ProfileRow
+//                       icon={<Mountain size={17} />}
+//                       label={
+//                         t("soil_type") ||
+//                         "Soil Type"
+//                       }
+//                       value={
+//                         profile.soilType
+//                       }
+//                       last
+//                     />
+//                   </>
+//                 )}
+
+//               </div>
+
+
+//               {/* RIGHT */}
+
+//               <div>
+
+//                 {editMode ? (
+//                   <>
+//                     <EditRow
+//                       icon={<Droplets size={17} />}
+//                       label={
+//                         t("water_source") ||
+//                         "Water Source"
+//                       }
+//                     >
+//                       <StyledInput
+//                         type="text"
+//                         name="waterSource"
+//                         value={
+//                           profile.waterSource ||
+//                           ""
+//                         }
+//                         onChange={handleChange}
+//                       />
+//                     </EditRow>
+
+//                     <EditRow
+//                       icon={<Mountain size={17} />}
+//                       label={
+//                         t("land_area") ||
+//                         "Land Area"
+//                       }
+//                     >
+//                       <div className="flex gap-2">
+
+//                         <StyledInput
+//                           type="number"
+//                           name="landArea"
+//                           value={
+//                             profile.landArea ||
+//                             ""
+//                           }
+//                           onChange={handleChange}
+//                           className="!w-[85px]"
+//                         />
+
+//                         <StyledSelect
+//                           name="landUnit"
+//                           value={
+//                             profile.landUnit ||
+//                             "Acres"
+//                           }
+//                           onChange={handleChange}
+//                           className="!w-[110px]"
+//                         >
+//                           <option value="Acres">
+//                             Acres
+//                           </option>
+
+//                           <option value="Hectares">
+//                             Hectares
+//                           </option>
+//                         </StyledSelect>
+
+//                       </div>
+//                     </EditRow>
+
+//                     <EditRow
+//                       icon={<Calendar size={17} />}
+//                       label={
+//                         t("experience") ||
+//                         "Experience"
+//                       }
+//                     >
+//                       <StyledInput
+//                         type="number"
+//                         name="farmingExperience"
+//                         value={
+//                           profile.farmingExperience ||
+//                           ""
+//                         }
+//                         onChange={handleChange}
+//                       />
+//                     </EditRow>
+
+//                     <EditRow
+//                       icon={<Droplets size={17} />}
+//                       label={
+//                         t("irrigation_type") ||
+//                         "Irrigation Type"
+//                       }
+//                       last
+//                     >
+//                       <StyledInput
+//                         type="text"
+//                         name="irrigationType"
+//                         value={
+//                           profile.irrigationType ||
+//                           ""
+//                         }
+//                         onChange={handleChange}
+//                       />
+//                     </EditRow>
+//                   </>
+//                 ) : (
+//                   <>
+//                     <ProfileRow
+//                       icon={<Droplets size={17} />}
+//                       label={
+//                         t("water_source") ||
+//                         "Water Source"
+//                       }
+//                       value={
+//                         profile.waterSource
+//                       }
+//                     />
+
+//                     <ProfileRow
+//                       icon={<Mountain size={17} />}
+//                       label={
+//                         t("land_area") ||
+//                         "Land Area"
+//                       }
+//                       value={
+//                         profile.landArea
+//                           ? `${profile.landArea} ${
+//                               profile.landUnit ||
+//                               "Acres"
+//                             }`
+//                           : "--"
+//                       }
+//                     />
+
+//                     <ProfileRow
+//                       icon={<Calendar size={17} />}
+//                       label={
+//                         t("experience") ||
+//                         "Experience"
+//                       }
+//                       value={
+//                         profile.farmingExperience
+//                           ? `${profile.farmingExperience} ${
+//                               t("years") ||
+//                               "years"
+//                             }`
+//                           : "--"
+//                       }
+//                     />
+
+//                     <ProfileRow
+//                       icon={<Droplets size={17} />}
+//                       label={
+//                         t("irrigation_type") ||
+//                         "Irrigation Type"
+//                       }
+//                       value={
+//                         profile.irrigationType
+//                       }
+//                       last
+//                     />
+//                   </>
+//                 )}
+
+//               </div>
+
+//             </div>
+
+//           </motion.section>
+
+//         </div>
+
+
+//         {/* =====================================================
+//             FARM LOCATION
+//         ===================================================== */}
+
+//         <motion.section
+//           initial={{
+//             opacity: 0,
+//             y: 12,
+//           }}
+//           animate={{
+//             opacity: 1,
+//             y: 0,
+//           }}
+//           transition={{
+//             duration: 0.45,
+//           }}
+//           className="
+//             mt-6
+//             bg-white
+//             rounded-[20px]
+//             border
+//             border-[#e0e7e3]
+//             shadow-[0_7px_25px_rgba(30,57,45,0.055)]
+//             px-6
+//             sm:px-7
+//             pt-6
+//             pb-6
+//           "
+//         >
+
+//           <CardHeader
+//             icon={<MapPin size={21} />}
+//             title={
+//               t("farm_location") ||
+//               "Farm Location"
+//             }
+//             subtitle={
+//               t("farm_location_desc") ||
+//               "Where is your farm located?"
+//             }
+//           />
+
+//           {editMode ? (
+//             <div
+//               className="
+//                 grid
+//                 sm:grid-cols-2
+//                 lg:grid-cols-3
+//                 gap-5
+//                 mt-6
+//               "
+//             >
+
+//               <EditInput
+//                 label={
+//                   t("state") || "State"
+//                 }
+//                 name="state"
+//                 value={profile.state}
+//                 onChange={handleChange}
+//               />
+
+//               <EditInput
+//                 label={
+//                   t("district") ||
+//                   "District"
+//                 }
+//                 name="district"
+//                 value={profile.district}
+//                 onChange={handleChange}
+//               />
+
+//               <EditInput
+//                 label={
+//                   t("village") ||
+//                   "Village"
+//                 }
+//                 name="village"
+//                 value={profile.village}
+//                 onChange={handleChange}
+//               />
+
+//               <EditInput
+//                 label={
+//                   t("pin_code") ||
+//                   "PIN Code"
+//                 }
+//                 name="pincode"
+//                 value={profile.pincode}
+//                 onChange={handleChange}
+//               />
+
+//               <EditInput
+//                 label="Latitude"
+//                 name="latitude"
+//                 value={profile.latitude}
+//                 onChange={handleChange}
+//               />
+
+//               <EditInput
+//                 label="Longitude"
+//                 name="longitude"
+//                 value={profile.longitude}
+//                 onChange={handleChange}
+//               />
+
+//             </div>
+//           ) : (
+//             <div
+//               className="
+//                 grid
+//                 xl:grid-cols-[1.15fr_1fr]
+//                 gap-5
+//                 mt-6
+//               "
+//             >
+
+//               {/* MAP */}
+
+//               <div
+//                 className="
+//                   h-[180px]
+//                   rounded-[15px]
+//                   overflow-hidden
+//                   border
+//                   border-[#dce5e0]
+//                   bg-[#edf2ef]
+//                 "
+//               >
+//                 <iframe
+//                   title="Farm Location"
+//                   src={mapUrl}
+//                   className="
+//                     w-full
+//                     h-full
+//                     border-0
+//                   "
+//                   loading="lazy"
+//                 />
+//               </div>
+
+
+//               {/* LOCATION CARDS */}
+
+//               <div
+//                 className="
+//                   grid
+//                   grid-cols-2
+//                   gap-3
+//                 "
+//               >
+
+//                 <LocationCard
+//                   icon={
+//                     <Landmark size={19} />
+//                   }
+//                   title={
+//                     t("state") || "State"
+//                   }
+//                   value={profile.state}
+//                 />
+
+//                 <LocationCard
+//                   icon={
+//                     <MapPin size={19} />
+//                   }
+//                   title={
+//                     t("district") ||
+//                     "District"
+//                   }
+//                   value={
+//                     profile.district
+//                   }
+//                 />
+
+//                 <LocationCard
+//                   icon={
+//                     <Home size={19} />
+//                   }
+//                   title={
+//                     t("village") ||
+//                     "Village"
+//                   }
+//                   value={
+//                     profile.village
+//                   }
+//                 />
+
+//                 <LocationCard
+//                   icon={
+//                     <Building2 size={19} />
+//                   }
+//                   title={
+//                     t("pin_code") ||
+//                     "PIN Code"
+//                   }
+//                   value={
+//                     profile.pincode
+//                   }
+//                 />
+
+//               </div>
+
+//             </div>
+//           )}
+
+//         </motion.section>
+
+//       </div>
+//     </div>
+//   );
+// }
+
+
+// /* ============================================================
+//    CARD HEADER
+// ============================================================ */
+
+// function CardHeader({
+//   icon,
+//   title,
+//   subtitle,
+// }) {
+//   return (
+//     <div className="flex items-center gap-3.5">
+
+//       <div
+//         className="
+//           w-[44px]
+//           h-[44px]
+//           rounded-[12px]
+//           bg-[#edf2ef]
+//           border
+//           border-[#e0e7e3]
+//           text-[#08753d]
+//           flex
+//           items-center
+//           justify-center
+//           shrink-0
+//         "
+//       >
+//         {icon}
+//       </div>
+
+//       <div className="min-w-0">
+
+//         <h2
+//           className="
+//             text-[19px]
+//             font-bold
+//             text-[#20342b]
+//             leading-tight
+//             tracking-[-0.25px]
+//           "
+//         >
+//           {title}
+//         </h2>
+
+//         <p
+//           className="
+//             text-[12px]
+//             sm:text-[13px]
+//             text-[#78847f]
+//             mt-1
+//           "
+//         >
+//           {subtitle}
+//         </p>
+
+//       </div>
+
+//     </div>
+//   );
+// }
+
+
+// /* ============================================================
+//    PROFILE ROW
+// ============================================================ */
+
+// function ProfileRow({
+//   icon,
+//   label,
+//   value,
+//   last = false,
+// }) {
+//   return (
+//     <div
+//       className={`
+//         min-h-[57px]
+//         py-2.5
+//         flex
+//         items-center
+//         gap-3.5
+//         ${
+//           !last
+//             ? "border-b border-[#edf1ee]"
+//             : ""
+//         }
+//       `}
+//     >
+
+//       <div
+//         className="
+//           w-[35px]
+//           h-[35px]
+//           rounded-[9px]
+//           bg-[#f0f4f1]
+//           border
+//           border-[#e4eae6]
+//           text-[#08753d]
+//           flex
+//           items-center
+//           justify-center
+//           shrink-0
+//         "
+//       >
+//         {icon}
+//       </div>
+
+//       <div className="min-w-0">
+
+//         <p
+//           className="
+//             text-[12px]
+//             text-[#7c8883]
+//             leading-none
+//           "
+//         >
+//           {label}
+//         </p>
+
+//         <p
+//           className="
+//             mt-1.5
+//             text-[14px]
+//             font-semibold
+//             text-[#293b33]
+//             truncate
+//           "
+//         >
+//           {value || "--"}
+//         </p>
+
+//       </div>
+
+//     </div>
+//   );
+// }
+
+
+// /* ============================================================
+//    EDIT ROW
+// ============================================================ */
+
+// function EditRow({
+//   icon,
+//   label,
+//   children,
+//   last = false,
+// }) {
+//   return (
+//     <div
+//       className={`
+//         min-h-[59px]
+//         py-2.5
+//         flex
+//         items-center
+//         gap-3.5
+//         ${
+//           !last
+//             ? "border-b border-[#edf1ee]"
+//             : ""
+//         }
+//       `}
+//     >
+
+//       <div
+//         className="
+//           w-[35px]
+//           h-[35px]
+//           rounded-[9px]
+//           bg-[#f0f4f1]
+//           border
+//           border-[#e4eae6]
+//           text-[#08753d]
+//           flex
+//           items-center
+//           justify-center
+//           shrink-0
+//         "
+//       >
+//         {icon}
+//       </div>
+
+//       <div className="flex-1 min-w-0">
+
+//         <p
+//           className="
+//             text-[12px]
+//             text-[#7c8883]
+//             mb-1.5
+//           "
+//         >
+//           {label}
+//         </p>
+
+//         {children}
+
+//       </div>
+
+//     </div>
+//   );
+// }
+
+
+// /* ============================================================
+//    STYLED INPUT
+// ============================================================ */
+
+// function StyledInput({
+//   className = "",
+//   ...props
+// }) {
+//   return (
+//     <input
+//       {...props}
+//       className={`
+//         w-full
+//         h-[39px]
+//         px-3
+//         rounded-[9px]
+//         border
+//         border-[#d8e1dc]
+//         bg-[#fafcfb]
+//         text-[14px]
+//         font-medium
+//         text-[#293b33]
+//         outline-none
+//         transition
+
+//         focus:border-[#08753d]
+//         focus:bg-white
+//         focus:ring-2
+//         focus:ring-[#08753d]/10
+
+//         placeholder:text-[#9aa49f]
+
+//         ${className}
+//       `}
+//     />
+//   );
+// }
+
+
+// /* ============================================================
+//    STYLED SELECT
+// ============================================================ */
+
+// function StyledSelect({
+//   className = "",
+//   children,
+//   ...props
+// }) {
+//   return (
+//     <select
+//       {...props}
+//       className={`
+//         w-full
+//         h-[39px]
+//         px-3
+//         rounded-[9px]
+//         border
+//         border-[#d8e1dc]
+//         bg-[#fafcfb]
+//         text-[14px]
+//         font-medium
+//         text-[#293b33]
+//         outline-none
+//         cursor-pointer
+//         transition
+
+//         focus:border-[#08753d]
+//         focus:bg-white
+//         focus:ring-2
+//         focus:ring-[#08753d]/10
+
+//         ${className}
+//       `}
+//     >
+//       {children}
+//     </select>
+//   );
+// }
+
+
+// /* ============================================================
+//    LOCATION EDIT INPUT
+// ============================================================ */
+
+// function EditInput({
+//   label,
+//   name,
+//   value,
+//   onChange,
+// }) {
+//   return (
+//     <div>
+
+//       <label
+//         className="
+//           block
+//           text-[12px]
+//           font-semibold
+//           text-[#687771]
+//           mb-2
+//         "
+//       >
+//         {label}
+//       </label>
+
+//       <input
+//         type="text"
+//         name={name}
+//         value={value || ""}
+//         onChange={onChange}
+//         className="
+//           w-full
+//           h-[43px]
+//           px-3.5
+//           rounded-xl
+//           border
+//           border-[#d8e1dc]
+//           bg-[#fafcfb]
+//           text-[14px]
+//           font-medium
+//           text-[#293b33]
+//           outline-none
+//           transition
+
+//           focus:border-[#08753d]
+//           focus:bg-white
+//           focus:ring-2
+//           focus:ring-[#08753d]/10
+//         "
+//       />
+
+//     </div>
+//   );
+// }
+
+
+// /* ============================================================
+//    LOCATION CARD
+// ============================================================ */
+
+// function LocationCard({
+//   icon,
+//   title,
+//   value,
+// }) {
+//   return (
+//     <motion.div
+//       whileHover={{
+//         y: -2,
+//       }}
+//       transition={{
+//         duration: 0.2,
+//       }}
+//       className="
+//         min-h-[88px]
+//         rounded-[13px]
+//         border
+//         border-[#dfe7e2]
+//         bg-[#fbfcfb]
+
+//         flex
+//         items-center
+//         gap-3
+
+//         px-4
+
+//         transition
+
+//         hover:border-[#ccd9d1]
+//         hover:bg-[#f8faf9]
+//       "
+//     >
+
+//       <div
+//         className="
+//           w-[36px]
+//           h-[36px]
+//           rounded-[9px]
+//           bg-[#edf2ef]
+//           border
+//           border-[#e0e7e3]
+//           text-[#08753d]
+
+//           flex
+//           items-center
+//           justify-center
+//           shrink-0
+//         "
+//       >
+//         {icon}
+//       </div>
+
+//       <div className="min-w-0">
+
+//         <p
+//           className="
+//             text-[11px]
+//             font-medium
+//             text-[#7b8782]
+//           "
+//         >
+//           {title}
+//         </p>
+
+//         <p
+//           className="
+//             mt-1
+//             text-[14px]
+//             font-bold
+//             text-[#293b33]
+//             truncate
+//           "
+//         >
+//           {value || "--"}
+//         </p>
+
+//       </div>
+
+//     </motion.div>
+//   );
+// }
+
+
+
+
+
+
+
+
 // src/pages/Profile.jsx
 
 import { useEffect, useState } from "react";
@@ -3496,21 +5596,42 @@ export default function Profile() {
       if (res.data.exists) {
         const loadedProfile = res.data.profile;
 
-        setProfile(loadedProfile);
-        setOriginalProfile(loadedProfile);
+        /*
+         * IMPORTANT:
+         *
+         * Do NOT change i18n language using the language
+         * stored in the database when this page opens.
+         *
+         * Example:
+         *
+         * Database language = "en"
+         * Current Topbar language = "te"
+         *
+         * Previously Profile would change the whole website
+         * back to English.
+         *
+         * Now the currently active i18next language is preserved.
+         */
 
-        if (
-          loadedProfile.language &&
-          loadedProfile.language !== i18n.language
-        ) {
-          await i18n.changeLanguage(loadedProfile.language);
-        }
+        const activeLanguage =
+          i18n.resolvedLanguage ||
+          i18n.language ||
+          "en";
+
+        const profileWithActiveLanguage = {
+          ...loadedProfile,
+          language: activeLanguage,
+        };
+
+        setProfile(profileWithActiveLanguage);
+        setOriginalProfile(profileWithActiveLanguage);
       }
     } catch (err) {
       console.error("Error fetching profile:", err);
 
       toast.error(
-        t("profile_load_failed") || "Unable to load profile"
+        t("profile_load_failed") ||
+          "Unable to load profile"
       );
     } finally {
       setLoading(false);
@@ -3523,6 +5644,32 @@ export default function Profile() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    /*
+     * When language is changed inside My Profile,
+     * immediately change the global i18next language.
+     */
+
+    if (name === "language") {
+      i18n.changeLanguage(value);
+
+      document.documentElement.lang = value;
+
+      /*
+       * Notify other FarmXpert components immediately.
+       */
+
+      window.dispatchEvent(
+        new CustomEvent(
+          "farmxpert:languageChanged",
+          {
+            detail: {
+              language: value,
+            },
+          }
+        )
+      );
+    }
 
     setProfile((prev) => ({
       ...prev,
@@ -3573,36 +5720,65 @@ export default function Profile() {
       }
 
       if (!profile.mobile?.trim()) {
-        toast.error("Please enter your mobile number");
+        toast.error(
+          t("please_enter_mobile") ||
+            "Please enter your mobile number"
+        );
 
         setSaving(false);
         return;
       }
 
       if (!profile.farmName?.trim()) {
-        toast.error("Please enter your farm name");
+        toast.error(
+          t("please_enter_farm_name") ||
+            "Please enter your farm name"
+        );
 
         setSaving(false);
         return;
       }
 
       if (!profile.primaryCrop?.trim()) {
-        toast.error("Please enter your primary crop");
+        toast.error(
+          t("please_enter_primary_crop") ||
+            "Please enter your primary crop"
+        );
 
         setSaving(false);
         return;
       }
 
-      if (!profile.state?.trim() || !profile.district?.trim()) {
-        toast.error("Please enter your location details");
+      if (
+        !profile.state?.trim() ||
+        !profile.district?.trim()
+      ) {
+        toast.error(
+          t("please_enter_location") ||
+            "Please enter your location details"
+        );
 
         setSaving(false);
         return;
       }
+
+      /*
+       * IMPORTANT:
+       *
+       * Always save the currently active i18next language.
+       *
+       * This prevents an old database language from becoming
+       * the active website language.
+       */
+
+      const activeLanguage =
+        i18n.resolvedLanguage ||
+        i18n.language ||
+        "en";
 
       const updatedProfile = {
         ...profile,
-        language: profile.language || i18n.language,
+        language: activeLanguage,
       };
 
       const response = await api.post(
@@ -3611,26 +5787,51 @@ export default function Profile() {
       );
 
       const savedProfile =
-        response.data?.profile || updatedProfile;
+        response.data?.profile ||
+        updatedProfile;
 
-      setProfile(savedProfile);
-      setOriginalProfile(savedProfile);
+      /*
+       * Keep the currently selected language in the local
+       * profile state as well.
+       */
+
+      const profileToStore = {
+        ...savedProfile,
+        language: activeLanguage,
+      };
+
+      setProfile(profileToStore);
+
+      setOriginalProfile(profileToStore);
 
       setEditMode(false);
 
-      if (
-        savedProfile.language &&
-        savedProfile.language !== i18n.language
-      ) {
-        await i18n.changeLanguage(savedProfile.language);
-      }
+      /*
+       * Make sure the document language is synchronized.
+       */
+
+      document.documentElement.lang =
+        activeLanguage;
+
+      /*
+       * DO NOT call:
+       *
+       * i18n.changeLanguage(savedProfile.language)
+       *
+       * here.
+       *
+       * The currently active language is already correct.
+       */
 
       toast.success(
         t("profile_saved") ||
           "Profile updated successfully"
       );
     } catch (err) {
-      console.error("Profile update error:", err);
+      console.error(
+        "Profile update error:",
+        err
+      );
 
       toast.error(
         err.response?.data?.error ||
@@ -3650,6 +5851,7 @@ export default function Profile() {
     return (
       <div className="min-h-screen bg-[#f3f6f4] flex items-center justify-center">
         <div className="text-center">
+
           <div
             className="
               w-10
@@ -3671,8 +5873,10 @@ export default function Profile() {
               text-[#687771]
             "
           >
-            {t("loading_profile") || "Loading profile..."}
+            {t("loading_profile") ||
+              "Loading profile..."}
           </p>
+
         </div>
       </div>
     );
@@ -3694,6 +5898,7 @@ export default function Profile() {
           px-5
         "
       >
+
         <div
           className="
             w-full
@@ -3707,6 +5912,7 @@ export default function Profile() {
             text-center
           "
         >
+
           <div
             className="
               w-16
@@ -3720,7 +5926,10 @@ export default function Profile() {
               justify-center
             "
           >
-            <User size={27} strokeWidth={1.7} />
+            <User
+              size={27}
+              strokeWidth={1.7}
+            />
           </div>
 
           <h2
@@ -3731,7 +5940,8 @@ export default function Profile() {
               text-[#20332a]
             "
           >
-            {t("profile_title") || "Your Profile"}
+            {t("profile_title") ||
+              "Your Profile"}
           </h2>
 
           <p
@@ -3742,12 +5952,14 @@ export default function Profile() {
               text-[#71807a]
             "
           >
-            Create your farmer profile to manage
-            your information.
+            {t("create_profile_description") ||
+              "Create your farmer profile to manage your information."}
           </p>
 
           <button
-            onClick={() => navigate("/farmer-profile")}
+            onClick={() =>
+              navigate("/farmer-profile")
+            }
             className="
               mt-7
               h-[45px]
@@ -3761,9 +5973,12 @@ export default function Profile() {
               transition
             "
           >
-            {t("edit_profile") || "Create Profile"}
+            {t("edit_profile") ||
+              "Create Profile"}
           </button>
+
         </div>
+
       </div>
     );
   }
@@ -3772,10 +5987,15 @@ export default function Profile() {
      LANGUAGE
   ========================================================= */
 
+  const currentLanguage =
+    i18n.resolvedLanguage ||
+    i18n.language ||
+    "en";
+
   const languageName =
-    i18n.language === "te"
+    currentLanguage === "te"
       ? "తెలుగు"
-      : i18n.language === "hi"
+      : currentLanguage === "hi"
       ? "हिंदी"
       : "English";
 
@@ -3784,10 +6004,12 @@ export default function Profile() {
   ========================================================= */
 
   const mapLat =
-    Number(profile.latitude) || 16.9891;
+    Number(profile.latitude) ||
+    16.9891;
 
   const mapLng =
-    Number(profile.longitude) || 82.2475;
+    Number(profile.longitude) ||
+    82.2475;
 
   const mapDelta = 0.08;
 
@@ -3809,6 +6031,7 @@ export default function Profile() {
         lg:py-7
       "
     >
+
       <div className="max-w-[1295px] mx-auto">
 
         {/* =====================================================
@@ -3946,22 +6169,17 @@ export default function Profile() {
                     sm:w-[108px]
                     sm:h-[108px]
                     rounded-full
-
                     bg-white/[0.08]
                     backdrop-blur-sm
-
                     border
                     border-white/65
-
                     flex
                     items-center
                     justify-center
-
                     text-[39px]
                     sm:text-[46px]
                     font-bold
                     text-white
-
                     shadow-[0_8px_24px_rgba(0,0,0,0.16)]
                   "
                 >
@@ -3982,7 +6200,10 @@ export default function Profile() {
                   <input
                     type="text"
                     name="fullName"
-                    value={profile.fullName || ""}
+                    value={
+                      profile.fullName ||
+                      ""
+                    }
                     onChange={handleChange}
                     className="
                       w-full
@@ -3990,20 +6211,15 @@ export default function Profile() {
                       h-[46px]
                       px-4
                       rounded-xl
-
                       bg-white/[0.10]
                       border
                       border-white/30
-
                       text-[24px]
                       sm:text-[28px]
                       font-bold
                       text-white
-
                       outline-none
-
                       placeholder:text-white/50
-
                       focus:border-white/55
                       focus:bg-white/[0.13]
                     "
@@ -4014,16 +6230,14 @@ export default function Profile() {
                       text-[29px]
                       sm:text-[33px]
                       lg:text-[35px]
-
                       leading-[1.12]
-
                       font-bold
                       tracking-[-0.7px]
-
                       text-white
                     "
                   >
-                    {profile.fullName || "--"}
+                    {profile.fullName ||
+                      "--"}
                   </h1>
                 )}
 
@@ -4035,6 +6249,7 @@ export default function Profile() {
                     mt-2.5
                   "
                 >
+
                   <span
                     className="
                       w-[7px]
@@ -4056,12 +6271,12 @@ export default function Profile() {
                     {t("smart_farmer") ||
                       "Smart Farmer"}
                   </p>
+
                 </div>
 
               </div>
 
             </div>
-
 
             {/* =================================================
                 ACTION BUTTONS
@@ -4081,6 +6296,7 @@ export default function Profile() {
 
               {!editMode ? (
                 <>
+
                   {/* DASHBOARD */}
 
                   <button
@@ -4090,42 +6306,33 @@ export default function Profile() {
                     }
                     className="
                       group
-
                       h-[46px]
                       min-w-[124px]
                       px-[18px]
-
                       rounded-[11px]
-
                       bg-white
                       border
                       border-white
-
                       text-[#08753d]
                       text-[14px]
                       font-semibold
-
                       flex
                       items-center
                       justify-center
                       gap-2
-
                       shadow-[0_5px_15px_rgba(0,0,0,0.13)]
-
                       transition-all
                       duration-200
-
                       hover:bg-[#f7faf8]
                       hover:-translate-y-[1px]
                       hover:shadow-[0_7px_18px_rgba(0,0,0,0.16)]
-
                       active:translate-y-0
-
                       focus:outline-none
                       focus:ring-2
                       focus:ring-white/40
                     "
                   >
+
                     <ArrowLeft
                       size={17}
                       strokeWidth={2.2}
@@ -4140,8 +6347,8 @@ export default function Profile() {
                       {t("nav_dashboard") ||
                         "Dashboard"}
                     </span>
-                  </button>
 
+                  </button>
 
                   {/* EDIT PROFILE */}
 
@@ -4150,45 +6357,35 @@ export default function Profile() {
                     onClick={handleEdit}
                     className="
                       group
-
                       h-[46px]
                       min-w-[132px]
                       px-[18px]
-
                       rounded-[11px]
-
                       bg-white/[0.08]
                       border
                       border-white/45
-
                       text-white
                       text-[14px]
                       font-semibold
-
                       flex
                       items-center
                       justify-center
                       gap-2
-
                       backdrop-blur-sm
-
                       shadow-[0_4px_14px_rgba(0,0,0,0.07)]
-
                       transition-all
                       duration-200
-
                       hover:bg-white/[0.15]
                       hover:border-white/65
                       hover:-translate-y-[1px]
                       hover:shadow-[0_7px_18px_rgba(0,0,0,0.12)]
-
                       active:translate-y-0
-
                       focus:outline-none
                       focus:ring-2
                       focus:ring-white/30
                     "
                   >
+
                     <Edit3
                       size={17}
                       strokeWidth={2}
@@ -4203,10 +6400,13 @@ export default function Profile() {
                       {t("edit_profile") ||
                         "Edit Profile"}
                     </span>
+
                   </button>
+
                 </>
               ) : (
                 <>
+
                   {/* CANCEL */}
 
                   <button
@@ -4217,48 +6417,40 @@ export default function Profile() {
                       h-[46px]
                       min-w-[100px]
                       px-[18px]
-
                       rounded-[11px]
-
                       bg-white
                       border
                       border-white
-
                       text-[#40534a]
                       text-[14px]
                       font-semibold
-
                       flex
                       items-center
                       justify-center
                       gap-2
-
                       shadow-[0_5px_15px_rgba(0,0,0,0.12)]
-
                       transition-all
                       duration-200
-
                       hover:bg-[#f7f9f8]
                       hover:-translate-y-[1px]
-
                       active:translate-y-0
-
                       disabled:opacity-50
                       disabled:cursor-not-allowed
-
                       focus:outline-none
                     "
                   >
+
                     <X
                       size={17}
                       strokeWidth={2.1}
                     />
 
                     <span>
-                      Cancel
+                      {t("cancel") ||
+                        "Cancel"}
                     </span>
-                  </button>
 
+                  </button>
 
                   {/* SAVE */}
 
@@ -4268,43 +6460,33 @@ export default function Profile() {
                     disabled={saving}
                     className="
                       group
-
                       h-[46px]
                       min-w-[138px]
                       px-[18px]
-
                       rounded-[11px]
-
                       bg-[#eaf4ee]
                       border
                       border-white/70
-
                       text-[#08753d]
                       text-[14px]
                       font-semibold
-
                       flex
                       items-center
                       justify-center
                       gap-2
-
                       shadow-[0_5px_15px_rgba(0,0,0,0.10)]
-
                       transition-all
                       duration-200
-
                       hover:bg-white
                       hover:-translate-y-[1px]
                       hover:shadow-[0_7px_18px_rgba(0,0,0,0.13)]
-
                       active:translate-y-0
-
                       disabled:opacity-50
                       disabled:cursor-not-allowed
-
                       focus:outline-none
                     "
                   >
+
                     {saving ? (
                       <Loader2
                         size={17}
@@ -4319,18 +6501,22 @@ export default function Profile() {
 
                     <span className="whitespace-nowrap">
                       {saving
-                        ? "Saving..."
-                        : "Save Changes"}
+                        ? t("saving") ||
+                          "Saving..."
+                        : t("save_changes") ||
+                          "Save Changes"}
                     </span>
+
                   </button>
+
                 </>
               )}
 
             </div>
 
           </div>
-        </motion.section>
 
+        </motion.section>
 
         {/* =====================================================
             PERSONAL + FARM INFORMATION
@@ -4389,6 +6575,7 @@ export default function Profile() {
 
               {editMode ? (
                 <>
+
                   <EditRow
                     icon={<User size={17} />}
                     label={
@@ -4399,7 +6586,10 @@ export default function Profile() {
                     <StyledInput
                       type="text"
                       name="fullName"
-                      value={profile.fullName || ""}
+                      value={
+                        profile.fullName ||
+                        ""
+                      }
                       onChange={handleChange}
                     />
                   </EditRow>
@@ -4414,7 +6604,10 @@ export default function Profile() {
                     <StyledInput
                       type="text"
                       name="mobile"
-                      value={profile.mobile || ""}
+                      value={
+                        profile.mobile ||
+                        ""
+                      }
                       onChange={handleChange}
                     />
                   </EditRow>
@@ -4422,13 +6615,17 @@ export default function Profile() {
                   <EditRow
                     icon={<Calendar size={17} />}
                     label={
-                      t("age") || "Age"
+                      t("age") ||
+                      "Age"
                     }
                   >
                     <StyledInput
                       type="number"
                       name="age"
-                      value={profile.age || ""}
+                      value={
+                        profile.age ||
+                        ""
+                      }
                       onChange={handleChange}
                     />
                   </EditRow>
@@ -4442,24 +6639,33 @@ export default function Profile() {
                   >
                     <StyledSelect
                       name="gender"
-                      value={profile.gender || ""}
+                      value={
+                        profile.gender ||
+                        ""
+                      }
                       onChange={handleChange}
                     >
+
                       <option value="">
-                        Select Gender
+                        {t("select_gender") ||
+                          "Select Gender"}
                       </option>
 
                       <option value="Male">
-                        Male
+                        {t("male") ||
+                          "Male"}
                       </option>
 
                       <option value="Female">
-                        Female
+                        {t("female") ||
+                          "Female"}
                       </option>
 
                       <option value="Other">
-                        Other
+                        {t("other") ||
+                          "Other"}
                       </option>
+
                     </StyledSelect>
                   </EditRow>
 
@@ -4471,14 +6677,16 @@ export default function Profile() {
                     }
                     last
                   >
+
                     <StyledSelect
                       name="language"
                       value={
                         profile.language ||
-                        i18n.language
+                        currentLanguage
                       }
                       onChange={handleChange}
                     >
+
                       <option value="en">
                         English
                       </option>
@@ -4490,18 +6698,24 @@ export default function Profile() {
                       <option value="hi">
                         हिंदी
                       </option>
+
                     </StyledSelect>
+
                   </EditRow>
+
                 </>
               ) : (
                 <>
+
                   <ProfileRow
                     icon={<User size={17} />}
                     label={
                       t("full_name") ||
                       "Full Name"
                     }
-                    value={profile.fullName}
+                    value={
+                      profile.fullName
+                    }
                   />
 
                   <ProfileRow
@@ -4510,13 +6724,20 @@ export default function Profile() {
                       t("mobile_number") ||
                       "Mobile Number"
                     }
-                    value={profile.mobile}
+                    value={
+                      profile.mobile
+                    }
                   />
 
                   <ProfileRow
                     icon={<Calendar size={17} />}
-                    label={t("age") || "Age"}
-                    value={profile.age}
+                    label={
+                      t("age") ||
+                      "Age"
+                    }
+                    value={
+                      profile.age
+                    }
                   />
 
                   <ProfileRow
@@ -4525,7 +6746,9 @@ export default function Profile() {
                       t("gender") ||
                       "Gender"
                     }
-                    value={profile.gender}
+                    value={
+                      profile.gender
+                    }
                   />
 
                   <ProfileRow
@@ -4534,16 +6757,18 @@ export default function Profile() {
                       t("current_language") ||
                       "Current Language"
                     }
-                    value={languageName}
+                    value={
+                      languageName
+                    }
                     last
                   />
+
                 </>
               )}
 
             </div>
 
           </motion.section>
-
 
           {/* FARM INFORMATION */}
 
@@ -4601,6 +6826,7 @@ export default function Profile() {
 
                 {editMode ? (
                   <>
+
                     <EditRow
                       icon={<Tractor size={17} />}
                       label={
@@ -4612,7 +6838,8 @@ export default function Profile() {
                         type="text"
                         name="farmName"
                         value={
-                          profile.farmName || ""
+                          profile.farmName ||
+                          ""
                         }
                         onChange={handleChange}
                       />
@@ -4629,7 +6856,8 @@ export default function Profile() {
                         type="text"
                         name="primaryCrop"
                         value={
-                          profile.primaryCrop || ""
+                          profile.primaryCrop ||
+                          ""
                         }
                         onChange={handleChange}
                       />
@@ -4646,7 +6874,8 @@ export default function Profile() {
                         type="text"
                         name="secondaryCrop"
                         value={
-                          profile.secondaryCrop || ""
+                          profile.secondaryCrop ||
+                          ""
                         }
                         onChange={handleChange}
                       />
@@ -4664,14 +6893,17 @@ export default function Profile() {
                         type="text"
                         name="soilType"
                         value={
-                          profile.soilType || ""
+                          profile.soilType ||
+                          ""
                         }
                         onChange={handleChange}
                       />
                     </EditRow>
+
                   </>
                 ) : (
                   <>
+
                     <ProfileRow
                       icon={<Tractor size={17} />}
                       label={
@@ -4716,11 +6948,11 @@ export default function Profile() {
                       }
                       last
                     />
+
                   </>
                 )}
 
               </div>
-
 
               {/* RIGHT */}
 
@@ -4728,6 +6960,7 @@ export default function Profile() {
 
                 {editMode ? (
                   <>
+
                     <EditRow
                       icon={<Droplets size={17} />}
                       label={
@@ -4753,6 +6986,7 @@ export default function Profile() {
                         "Land Area"
                       }
                     >
+
                       <div className="flex gap-2">
 
                         <StyledInput
@@ -4775,16 +7009,21 @@ export default function Profile() {
                           onChange={handleChange}
                           className="!w-[110px]"
                         >
+
                           <option value="Acres">
-                            Acres
+                            {t("acres") ||
+                              "Acres"}
                           </option>
 
                           <option value="Hectares">
-                            Hectares
+                            {t("hectares") ||
+                              "Hectares"}
                           </option>
+
                         </StyledSelect>
 
                       </div>
+
                     </EditRow>
 
                     <EditRow
@@ -4823,9 +7062,11 @@ export default function Profile() {
                         onChange={handleChange}
                       />
                     </EditRow>
+
                   </>
                 ) : (
                   <>
+
                     <ProfileRow
                       icon={<Droplets size={17} />}
                       label={
@@ -4847,6 +7088,7 @@ export default function Profile() {
                         profile.landArea
                           ? `${profile.landArea} ${
                               profile.landUnit ||
+                              t("acres") ||
                               "Acres"
                             }`
                           : "--"
@@ -4880,6 +7122,7 @@ export default function Profile() {
                       }
                       last
                     />
+
                   </>
                 )}
 
@@ -4890,7 +7133,6 @@ export default function Profile() {
           </motion.section>
 
         </div>
-
 
         {/* =====================================================
             FARM LOCATION
@@ -4947,7 +7189,8 @@ export default function Profile() {
 
               <EditInput
                 label={
-                  t("state") || "State"
+                  t("state") ||
+                  "State"
                 }
                 name="state"
                 value={profile.state}
@@ -4985,14 +7228,20 @@ export default function Profile() {
               />
 
               <EditInput
-                label="Latitude"
+                label={
+                  t("latitude") ||
+                  "Latitude"
+                }
                 name="latitude"
                 value={profile.latitude}
                 onChange={handleChange}
               />
 
               <EditInput
-                label="Longitude"
+                label={
+                  t("longitude") ||
+                  "Longitude"
+                }
                 name="longitude"
                 value={profile.longitude}
                 onChange={handleChange}
@@ -5021,8 +7270,12 @@ export default function Profile() {
                   bg-[#edf2ef]
                 "
               >
+
                 <iframe
-                  title="Farm Location"
+                  title={
+                    t("farm_location") ||
+                    "Farm Location"
+                  }
                   src={mapUrl}
                   className="
                     w-full
@@ -5031,8 +7284,8 @@ export default function Profile() {
                   "
                   loading="lazy"
                 />
-              </div>
 
+              </div>
 
               {/* LOCATION CARDS */}
 
@@ -5049,9 +7302,12 @@ export default function Profile() {
                     <Landmark size={19} />
                   }
                   title={
-                    t("state") || "State"
+                    t("state") ||
+                    "State"
                   }
-                  value={profile.state}
+                  value={
+                    profile.state
+                  }
                 />
 
                 <LocationCard
@@ -5101,6 +7357,7 @@ export default function Profile() {
         </motion.section>
 
       </div>
+
     </div>
   );
 }
@@ -5467,15 +7724,11 @@ function LocationCard({
         border
         border-[#dfe7e2]
         bg-[#fbfcfb]
-
         flex
         items-center
         gap-3
-
         px-4
-
         transition
-
         hover:border-[#ccd9d1]
         hover:bg-[#f8faf9]
       "
@@ -5490,7 +7743,6 @@ function LocationCard({
           border
           border-[#e0e7e3]
           text-[#08753d]
-
           flex
           items-center
           justify-center

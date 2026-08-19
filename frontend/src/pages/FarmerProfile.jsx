@@ -9352,6 +9352,2431 @@
 
 
 
+// import { useEffect, useState } from "react";
+// import { useNavigate } from "react-router-dom";
+// import { motion } from "framer-motion";
+
+// import {
+//     User,
+//     Phone,
+//     Tractor,
+//     Sprout,
+//     Mountain,
+//     Droplets,
+//     Calendar,
+//     ArrowRight,
+//     ArrowLeft,
+//     CheckCircle,
+//     Loader2,
+//     Globe,
+//     MapPin
+// } from "lucide-react";
+
+// import { toast } from "react-toastify";
+// import { useTranslation } from "react-i18next";
+
+// import api from "../api";
+
+// export default function FarmerProfile() {
+//     const navigate = useNavigate();
+//     const { t, i18n } = useTranslation();
+
+//     const [loading, setLoading] = useState(false);
+//     const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+//     const [step, setStep] = useState(1);
+
+//     const totalSteps = 4;
+
+//     const [profile, setProfile] = useState({
+//         fullName: "",
+//         mobile: "",
+//         gender: "",
+//         age: "",
+
+//         state: "",
+//         district: "",
+//         village: "",
+//         pincode: "",
+
+//         latitude: "",
+//         longitude: "",
+
+//         farmName: "",
+//         landArea: "",
+//         landUnit: "Acres",
+
+//         soilType: "",
+//         irrigationType: "",
+//         waterSource: "",
+
+//         primaryCrop: "",
+//         secondaryCrop: "",
+
+//         farmingType: "",
+//         farmingExperience: "",
+
+//         livestock: "",
+//         language: "en"
+//     });
+
+//     /* =========================================================
+//        LANGUAGE CHANGE REFRESH
+//     ========================================================= */
+
+//     const [, setLanguageVersion] = useState(0);
+
+//     useEffect(() => {
+//         const handleLanguageChange = () => {
+//             setLanguageVersion((previous) => previous + 1);
+//         };
+
+//         i18n.on("languageChanged", handleLanguageChange);
+
+//         return () => {
+//             i18n.off("languageChanged", handleLanguageChange);
+//         };
+//     }, [i18n]);
+
+//     /* =========================================================
+//        CHECK EXISTING PROFILE
+//     ========================================================= */
+
+//     useEffect(() => {
+//         checkExistingProfile();
+//     }, []);
+
+//     const checkExistingProfile = async () => {
+//         try {
+//             setIsLoadingProfile(true);
+
+//             const response = await api.get("/farmer/check");
+
+//             console.log("Profile check:", response.data);
+
+//             /* PROFILE ALREADY COMPLETED */
+
+//             if (
+//                 response.data.exists === true &&
+//                 response.data.isComplete === true
+//             ) {
+//                 navigate("/dashboard");
+//                 return;
+//             }
+
+//             /* PROFILE EXISTS BUT IS INCOMPLETE */
+
+//             if (
+//                 response.data.exists === true &&
+//                 response.data.isComplete === false
+//             ) {
+//                 const existingProfile =
+//                     response.data.profile || {};
+
+//                 setProfile((previous) => ({
+//                     ...previous,
+//                     ...existingProfile
+//                 }));
+
+//                 /* Restore saved language */
+
+//                 if (existingProfile.language) {
+//                     const savedLanguage =
+//                         existingProfile.language;
+
+//                     if (
+//                         savedLanguage !== i18n.language
+//                     ) {
+//                         await i18n.changeLanguage(
+//                             savedLanguage
+//                         );
+//                     }
+//                 }
+//             }
+//         } catch (error) {
+//             console.error(
+//                 "Error checking profile:",
+//                 error
+//             );
+//         } finally {
+//             setIsLoadingProfile(false);
+//         }
+//     };
+
+//     /* =========================================================
+//        LANGUAGE SELECTOR
+//     ========================================================= */
+
+//     const handleLanguageChange = async (e) => {
+//         const selectedLanguage = e.target.value;
+
+//         try {
+//             await i18n.changeLanguage(
+//                 selectedLanguage
+//             );
+
+//             setProfile((previous) => ({
+//                 ...previous,
+//                 language: selectedLanguage
+//             }));
+//         } catch (error) {
+//             console.error(
+//                 "Language change error:",
+//                 error
+//             );
+
+//             toast.error(
+//                 "Unable to change language."
+//             );
+//         }
+//     };
+
+//     /* =========================================================
+//        INPUT CHANGE
+//     ========================================================= */
+
+//     const handleChange = (e) => {
+//         const { name, value } = e.target;
+
+//         setProfile((previous) => ({
+//             ...previous,
+//             [name]: value
+//         }));
+//     };
+
+//     /* =========================================================
+//        CURRENT LOCATION
+//     ========================================================= */
+
+//     const getCurrentLocation = () => {
+//         if (!navigator.geolocation) {
+//             toast.error(
+//                 t("location_not_supported") ||
+//                     "Location is not supported by your browser."
+//             );
+
+//             return;
+//         }
+
+//         navigator.geolocation.getCurrentPosition(
+//             (position) => {
+//                 setProfile((previous) => ({
+//                     ...previous,
+//                     latitude:
+//                         position.coords.latitude,
+//                     longitude:
+//                         position.coords.longitude
+//                 }));
+
+//                 toast.success(
+//                     t("location_detected") ||
+//                         "Location detected successfully."
+//                 );
+//             },
+//             (error) => {
+//                 console.error(
+//                     "Location error:",
+//                     error
+//                 );
+
+//                 toast.error(
+//                     t("location_detection_failed") ||
+//                         "Unable to detect your location."
+//                 );
+//             },
+//             {
+//                 enableHighAccuracy: true,
+//                 timeout: 10000,
+//                 maximumAge: 0
+//             }
+//         );
+//     };
+
+//     /* =========================================================
+//        NEXT STEP
+//     ========================================================= */
+
+//     const nextStep = () => {
+//         if (step < totalSteps) {
+//             setStep(
+//                 (previous) => previous + 1
+//             );
+//         }
+//     };
+
+//     /* =========================================================
+//        PREVIOUS STEP
+//     ========================================================= */
+
+//     const previousStep = () => {
+//         if (step > 1) {
+//             setStep(
+//                 (previous) => previous - 1
+//             );
+//         }
+//     };
+
+//     /* =========================================================
+//        SKIP PROFILE
+//     ========================================================= */
+
+//     const skipProfile = async () => {
+//         try {
+//             setLoading(true);
+
+//             const response =
+//                 await api.post("/farmer/skip");
+
+//             console.log(
+//                 "Skip profile response:",
+//                 response.data
+//             );
+
+//             toast.success(
+//                 t("profile_skipped") ||
+//                     "Profile skipped. You can complete it later."
+//             );
+
+//             navigate("/dashboard", {
+//                 state: {
+//                     startGuidedTour: true
+//                 }
+//             });
+//         } catch (error) {
+//             console.error(
+//                 "Skip profile error:",
+//                 error
+//             );
+
+//             toast.error(
+//                 error.response?.data?.error ||
+//                     error.response?.data?.message ||
+//                     "Unable to skip profile."
+//             );
+//         } finally {
+//             setLoading(false);
+//         }
+//     };
+
+//     /* =========================================================
+//        SAVE PROFILE
+//     ========================================================= */
+
+//     const saveProfile = async () => {
+//         try {
+//             setLoading(true);
+
+//             const requiredFields = [
+//                 "fullName",
+//                 "mobile",
+//                 "state",
+//                 "district",
+//                 "farmName",
+//                 "primaryCrop"
+//             ];
+
+//             const missingFields =
+//                 requiredFields.filter(
+//                     (field) => {
+//                         const value =
+//                             profile[field];
+
+//                         return (
+//                             !value ||
+//                             String(value).trim() === ""
+//                         );
+//                     }
+//                 );
+
+//             /* VALIDATION */
+
+//             if (missingFields.length > 0) {
+//                 toast.error(
+//                     t(
+//                         "please_fill_all_required_fields"
+//                     ) ||
+//                         "Please fill all required fields."
+//                 );
+
+//                 const stepMap = {
+//                     fullName: 1,
+//                     mobile: 1,
+//                     state: 2,
+//                     district: 2,
+//                     farmName: 3,
+//                     primaryCrop: 4
+//                 };
+
+//                 const firstMissingStep =
+//                     stepMap[
+//                         missingFields[0]
+//                     ] || 1;
+
+//                 setStep(firstMissingStep);
+
+//                 setLoading(false);
+
+//                 return;
+//             }
+
+//             /* PROFILE DATA */
+
+//             const profileData = {
+//                 ...profile,
+//                 language:
+//                     i18n.language
+//             };
+
+//             /* SAVE TO MONGODB */
+
+//             const response =
+//                 await api.post(
+//                     "/farmer",
+//                     profileData
+//                 );
+
+//             console.log(
+//                 "Profile save response:",
+//                 response.data
+//             );
+
+//             toast.success(
+//                 t("profile_saved") ||
+//                     "Profile saved successfully."
+//             );
+
+//             /* START GUIDED TOUR AFTER PROFILE */
+
+//             navigate("/dashboard", {
+//                 state: {
+//                     startGuidedTour: true
+//                 }
+//             });
+//         } catch (error) {
+//             console.error(
+//                 "Save profile error:",
+//                 error
+//             );
+
+//             toast.error(
+//                 error.response?.data?.error ||
+//                     error.response?.data?.message ||
+//                     t("profile_save_failed") ||
+//                     "Failed to save profile."
+//             );
+//         } finally {
+//             setLoading(false);
+//         }
+//     };
+
+//     /* =========================================================
+//        LOADING SCREEN
+//     ========================================================= */
+
+//     if (isLoadingProfile) {
+//         return (
+//             <div
+//                 className="
+//                     min-h-screen
+//                     flex
+//                     items-center
+//                     justify-center
+//                     bg-[#f5f8f6]
+//                 "
+//             >
+//                 <div className="text-center">
+//                     <Loader2
+//                         className="
+//                             animate-spin
+//                             h-12
+//                             w-12
+//                             text-[#087443]
+//                             mx-auto
+//                         "
+//                     />
+
+//                     <p
+//                         className="
+//                             mt-4
+//                             text-gray-600
+//                             font-medium
+//                         "
+//                     >
+//                         {t("loading_profile") ||
+//                             "Loading profile..."}
+//                     </p>
+//                 </div>
+//             </div>
+//         );
+//     }
+
+//     /* =========================================================
+//        COMMON CLASSES
+//     ========================================================= */
+
+//     const inputClass = `
+//         w-full
+//         p-3.5
+//         rounded-xl
+//         border
+//         border-gray-200
+//         bg-gray-50/60
+//         text-gray-800
+//         outline-none
+//         transition
+//         focus:bg-white
+//         focus:border-[#087443]
+//         focus:ring-2
+//         focus:ring-[#087443]/10
+//     `;
+
+//     const labelClass = `
+//         text-sm
+//         font-semibold
+//         text-gray-700
+//         mb-2
+//         block
+//     `;
+
+//     /* =========================================================
+//        MAIN UI
+//     ========================================================= */
+
+//     return (
+//         <div
+//             className="
+//                 min-h-screen
+//                 bg-[#f5f8f6]
+//                 flex
+//                 items-center
+//                 justify-center
+//                 py-10
+//                 px-5
+//             "
+//         >
+//             <motion.div
+//                 initial={{
+//                     opacity: 0,
+//                     y: 20
+//                 }}
+//                 animate={{
+//                     opacity: 1,
+//                     y: 0
+//                 }}
+//                 transition={{
+//                     duration: 0.45
+//                 }}
+//                 className="
+//                     w-full
+//                     max-w-5xl
+//                     bg-white
+//                     rounded-3xl
+//                     shadow-[0_20px_60px_rgba(15,61,42,0.10)]
+//                     border
+//                     border-gray-100
+//                     overflow-hidden
+//                 "
+//             >
+//                 {/* =================================================
+//                    HEADER
+//                 ================================================= */}
+
+//                 <div
+//                     className="
+//                         bg-gradient-to-r
+//                         from-[#075d39]
+//                         to-[#0b8048]
+//                         text-white
+//                         px-8
+//                         py-8
+//                         md:px-10
+//                     "
+//                 >
+//                     <div
+//                         className="
+//                             flex
+//                             flex-col
+//                             md:flex-row
+//                             md:items-center
+//                             md:justify-between
+//                             gap-5
+//                         "
+//                     >
+//                         <div>
+//                             <h1
+//                                 className="
+//                                     text-3xl
+//                                     md:text-4xl
+//                                     font-bold
+//                                     tracking-tight
+//                                 "
+//                             >
+//                                 {t("profile_title") ||
+//                                     "Complete Farmer Profile"}
+//                             </h1>
+
+//                             <p
+//                                 className="
+//                                     mt-2
+//                                     text-green-50
+//                                     text-base
+//                                     md:text-lg
+//                                 "
+//                             >
+//                                 {t("profile_subtitle") ||
+//                                     "Help us personalize FarmXpert for your farm."}
+//                             </p>
+//                         </div>
+
+//                         {/* =================================================
+//                            LANGUAGE SELECTOR
+//                         ================================================= */}
+
+//                         <div
+//                             className="
+//                                 flex
+//                                 items-center
+//                                 gap-2
+//                                 text-green-50
+//                                 text-sm
+//                             "
+//                         >
+//                             <Globe size={18} />
+
+//                             <label
+//                                 htmlFor="profile-language"
+//                                 className="
+//                                     whitespace-nowrap
+//                                 "
+//                             >
+//                                 {t(
+//                                     "select_language",
+//                                     "Language"
+//                                 )}
+//                             </label>
+
+//                             <select
+//                                 id="profile-language"
+//                                 value={
+//                                     i18n.language?.startsWith(
+//                                         "te"
+//                                     )
+//                                         ? "te"
+//                                         : i18n.language?.startsWith(
+//                                               "hi"
+//                                           )
+//                                         ? "hi"
+//                                         : "en"
+//                                 }
+//                                 onChange={
+//                                     handleLanguageChange
+//                                 }
+//                                 className="
+//                                     min-w-[125px]
+//                                     px-3
+//                                     py-2
+//                                     rounded-xl
+//                                     bg-white
+//                                     text-gray-800
+//                                     border
+//                                     border-white/20
+//                                     outline-none
+//                                     font-medium
+//                                     cursor-pointer
+//                                     shadow-sm
+//                                     focus:ring-2
+//                                     focus:ring-white/30
+//                                 "
+//                             >
+//                                 <option value="en">
+//                                     {t(
+//                                         "english",
+//                                         "English"
+//                                     )}
+//                                 </option>
+
+//                                 <option value="te">
+//                                     {t(
+//                                         "telugu",
+//                                         "Telugu"
+//                                     )}
+//                                 </option>
+
+//                                 <option value="hi">
+//                                     {t(
+//                                         "hindi",
+//                                         "Hindi"
+//                                     )}
+//                                 </option>
+//                             </select>
+//                         </div>
+//                     </div>
+//                 </div>
+
+//                 {/* =================================================
+//                    PROGRESS
+//                 ================================================= */}
+
+//                 <div
+//                     className="
+//                         px-7
+//                         md:px-10
+//                         pt-8
+//                     "
+//                 >
+//                     <div
+//                         className="
+//                             flex
+//                             justify-between
+//                             gap-2
+//                         "
+//                     >
+//                         {[1, 2, 3, 4].map(
+//                             (item) => (
+//                                 <div
+//                                     key={item}
+//                                     className="
+//                                         flex
+//                                         flex-col
+//                                         items-center
+//                                         flex-1
+//                                     "
+//                                 >
+//                                     <div
+//                                         className={`
+//                                             w-11
+//                                             h-11
+//                                             md:w-12
+//                                             md:h-12
+//                                             rounded-full
+//                                             flex
+//                                             items-center
+//                                             justify-center
+//                                             font-bold
+//                                             transition-all
+//                                             duration-300
+//                                             ${
+//                                                 step >=
+//                                                 item
+//                                                     ? "bg-[#087443] text-white shadow-md"
+//                                                     : "bg-gray-100 text-gray-400"
+//                                             }
+//                                         `}
+//                                     >
+//                                         {step > item ? (
+//                                             <CheckCircle
+//                                                 size={20}
+//                                             />
+//                                         ) : (
+//                                             item
+//                                         )}
+//                                     </div>
+
+//                                     <span
+//                                         className="
+//                                             text-xs
+//                                             md:text-sm
+//                                             mt-2
+//                                             font-semibold
+//                                             text-gray-600
+//                                             text-center
+//                                         "
+//                                     >
+//                                         {item === 1 &&
+//                                             (t(
+//                                                 "personal"
+//                                             ) ||
+//                                                 "Personal")}
+
+//                                         {item === 2 &&
+//                                             (t(
+//                                                 "location"
+//                                             ) ||
+//                                                 "Location")}
+
+//                                         {item === 3 &&
+//                                             (t("farm") ||
+//                                                 "Farm")}
+
+//                                         {item === 4 &&
+//                                             (t(
+//                                                 "crops"
+//                                             ) ||
+//                                                 "Crops")}
+//                                     </span>
+//                                 </div>
+//                             )
+//                         )}
+//                     </div>
+
+//                     <div
+//                         className="
+//                             mt-5
+//                             h-1.5
+//                             rounded-full
+//                             bg-gray-100
+//                             overflow-hidden
+//                         "
+//                     >
+//                         <motion.div
+//                             animate={{
+//                                 width: `${step * 25}%`
+//                             }}
+//                             transition={{
+//                                 duration: 0.3
+//                             }}
+//                             className="
+//                                 bg-[#087443]
+//                                 h-full
+//                                 rounded-full
+//                             "
+//                         />
+//                     </div>
+//                 </div>
+
+//                 {/* =================================================
+//                    FORM CONTENT
+//                 ================================================= */}
+
+//                 <div
+//                     className="
+//                         px-7
+//                         md:px-10
+//                         py-8
+//                     "
+//                 >
+//                     {/* =================================================
+//                        STEP 1 — PERSONAL
+//                     ================================================= */}
+
+//                     {step === 1 && (
+//                         <motion.div
+//                             initial={{
+//                                 opacity: 0,
+//                                 x: 20
+//                             }}
+//                             animate={{
+//                                 opacity: 1,
+//                                 x: 0
+//                             }}
+//                             className="space-y-7"
+//                         >
+//                             <div>
+//                                 <h2
+//                                     className="
+//                                         text-2xl
+//                                         md:text-3xl
+//                                         font-bold
+//                                         text-[#172c25]
+//                                     "
+//                                 >
+//                                     {t(
+//                                         "personal_information"
+//                                     ) ||
+//                                         "Personal Information"}
+//                                 </h2>
+
+//                                 <p
+//                                     className="
+//                                         text-gray-500
+//                                         mt-2
+//                                     "
+//                                 >
+//                                     {t(
+//                                         "tell_about_yourself"
+//                                     ) ||
+//                                         "Tell us a little about yourself."}
+//                                 </p>
+//                             </div>
+
+//                             <div
+//                                 className="
+//                                     grid
+//                                     md:grid-cols-2
+//                                     gap-5
+//                                 "
+//                             >
+//                                 {/* FULL NAME */}
+
+//                                 <div>
+//                                     <label
+//                                         className={`
+//                                             ${labelClass}
+//                                             flex
+//                                             items-center
+//                                             gap-2
+//                                         `}
+//                                     >
+//                                         <User
+//                                             size={17}
+//                                             className="text-[#087443]"
+//                                         />
+
+//                                         {t(
+//                                             "full_name"
+//                                         ) ||
+//                                             "Full Name"}
+
+//                                         <span className="text-red-500">
+//                                             *
+//                                         </span>
+//                                     </label>
+
+//                                     <input
+//                                         type="text"
+//                                         name="fullName"
+//                                         value={
+//                                             profile.fullName
+//                                         }
+//                                         onChange={
+//                                             handleChange
+//                                         }
+//                                         placeholder={
+//                                             t(
+//                                                 "enter_full_name"
+//                                             ) ||
+//                                             "Enter your full name"
+//                                         }
+//                                         className={
+//                                             inputClass
+//                                         }
+//                                     />
+//                                 </div>
+
+//                                 {/* MOBILE */}
+
+//                                 <div>
+//                                     <label
+//                                         className={`
+//                                             ${labelClass}
+//                                             flex
+//                                             items-center
+//                                             gap-2
+//                                         `}
+//                                     >
+//                                         <Phone
+//                                             size={17}
+//                                             className="text-[#087443]"
+//                                         />
+
+//                                         {t(
+//                                             "mobile_number"
+//                                         ) ||
+//                                             "Mobile Number"}
+
+//                                         <span className="text-red-500">
+//                                             *
+//                                         </span>
+//                                     </label>
+
+//                                     <input
+//                                         type="tel"
+//                                         name="mobile"
+//                                         value={
+//                                             profile.mobile
+//                                         }
+//                                         onChange={
+//                                             handleChange
+//                                         }
+//                                         placeholder="9876543210"
+//                                         className={
+//                                             inputClass
+//                                         }
+//                                     />
+//                                 </div>
+
+//                                 {/* GENDER */}
+
+//                                 <div>
+//                                     <label
+//                                         className={
+//                                             labelClass
+//                                         }
+//                                     >
+//                                         {t("gender") ||
+//                                             "Gender"}
+//                                     </label>
+
+//                                     <select
+//                                         name="gender"
+//                                         value={
+//                                             profile.gender
+//                                         }
+//                                         onChange={
+//                                             handleChange
+//                                         }
+//                                         className={
+//                                             inputClass
+//                                         }
+//                                     >
+//                                         <option value="">
+//                                             {t(
+//                                                 "select_gender"
+//                                             ) ||
+//                                                 "Select Gender"}
+//                                         </option>
+
+//                                         <option value="Male">
+//                                             {t("male") ||
+//                                                 "Male"}
+//                                         </option>
+
+//                                         <option value="Female">
+//                                             {t("female") ||
+//                                                 "Female"}
+//                                         </option>
+
+//                                         <option value="Other">
+//                                             {t("other") ||
+//                                                 "Other"}
+//                                         </option>
+//                                     </select>
+//                                 </div>
+
+//                                 {/* AGE */}
+
+//                                 <div>
+//                                     <label
+//                                         className={`
+//                                             ${labelClass}
+//                                             flex
+//                                             items-center
+//                                             gap-2
+//                                         `}
+//                                     >
+//                                         <Calendar
+//                                             size={17}
+//                                             className="text-[#087443]"
+//                                         />
+
+//                                         {t("age") ||
+//                                             "Age"}
+//                                     </label>
+
+//                                     <input
+//                                         type="number"
+//                                         name="age"
+//                                         value={
+//                                             profile.age
+//                                         }
+//                                         onChange={
+//                                             handleChange
+//                                         }
+//                                         placeholder="35"
+//                                         className={
+//                                             inputClass
+//                                         }
+//                                     />
+//                                 </div>
+//                             </div>
+
+//                             {/* IDENTITY CARD */}
+
+//                             <div
+//                                 className="
+//                                     p-5
+//                                     rounded-2xl
+//                                     bg-[#f1f8f4]
+//                                     border
+//                                     border-[#d8eee1]
+//                                     flex
+//                                     items-start
+//                                     gap-4
+//                                 "
+//                             >
+//                                 <div
+//                                     className="
+//                                         w-12
+//                                         h-12
+//                                         rounded-xl
+//                                         bg-white
+//                                         border
+//                                         border-[#d8eee1]
+//                                         flex
+//                                         items-center
+//                                         justify-center
+//                                         shrink-0
+//                                     "
+//                                 >
+//                                     <User
+//                                         size={22}
+//                                         className="text-[#087443]"
+//                                     />
+//                                 </div>
+
+//                                 <div>
+//                                     <h3
+//                                         className="
+//                                             font-bold
+//                                             text-gray-800
+//                                         "
+//                                     >
+//                                         {t(
+//                                             "farmxpert_identity"
+//                                         ) ||
+//                                             "Your FarmXpert Profile"}
+//                                     </h3>
+
+//                                     <p
+//                                         className="
+//                                             text-sm
+//                                             text-gray-500
+//                                             mt-1
+//                                         "
+//                                     >
+//                                         {t(
+//                                             "identity_description"
+//                                         ) ||
+//                                             "This information helps personalize your farming experience."}
+//                                     </p>
+//                                 </div>
+//                             </div>
+//                         </motion.div>
+//                     )}
+
+//                     {/* =================================================
+//                        STEP 2 — LOCATION
+//                     ================================================= */}
+
+//                     {step === 2 && (
+//                         <motion.div
+//                             initial={{
+//                                 opacity: 0,
+//                                 x: 20
+//                             }}
+//                             animate={{
+//                                 opacity: 1,
+//                                 x: 0
+//                             }}
+//                             className="space-y-7"
+//                         >
+//                             <div>
+//                                 <h2
+//                                     className="
+//                                         text-2xl
+//                                         md:text-3xl
+//                                         font-bold
+//                                         text-[#172c25]
+//                                     "
+//                                 >
+//                                     {t(
+//                                         "farm_location"
+//                                     ) ||
+//                                         "Farm Location"}
+//                                 </h2>
+
+//                                 <p
+//                                     className="
+//                                         text-gray-500
+//                                         mt-2
+//                                     "
+//                                 >
+//                                     {t(
+//                                         "farm_location_desc"
+//                                     ) ||
+//                                         "Tell us where your farm is located."}
+//                                 </p>
+//                             </div>
+
+//                             <div
+//                                 className="
+//                                     grid
+//                                     md:grid-cols-2
+//                                     gap-5
+//                                 "
+//                             >
+//                                 {/* STATE */}
+
+//                                 <div>
+//                                     <label
+//                                         className={
+//                                             labelClass
+//                                         }
+//                                     >
+//                                         {t("state") ||
+//                                             "State"}
+
+//                                         <span className="text-red-500 ml-1">
+//                                             *
+//                                         </span>
+//                                     </label>
+
+//                                     <input
+//                                         type="text"
+//                                         name="state"
+//                                         value={
+//                                             profile.state
+//                                         }
+//                                         onChange={
+//                                             handleChange
+//                                         }
+//                                         placeholder="Andhra Pradesh"
+//                                         className={
+//                                             inputClass
+//                                         }
+//                                     />
+//                                 </div>
+
+//                                 {/* DISTRICT */}
+
+//                                 <div>
+//                                     <label
+//                                         className={
+//                                             labelClass
+//                                         }
+//                                     >
+//                                         {t(
+//                                             "district"
+//                                         ) ||
+//                                             "District"}
+
+//                                         <span className="text-red-500 ml-1">
+//                                             *
+//                                         </span>
+//                                     </label>
+
+//                                     <input
+//                                         type="text"
+//                                         name="district"
+//                                         value={
+//                                             profile.district
+//                                         }
+//                                         onChange={
+//                                             handleChange
+//                                         }
+//                                         placeholder="Kakinada"
+//                                         className={
+//                                             inputClass
+//                                         }
+//                                     />
+//                                 </div>
+
+//                                 {/* VILLAGE */}
+
+//                                 <div>
+//                                     <label
+//                                         className={
+//                                             labelClass
+//                                         }
+//                                     >
+//                                         {t(
+//                                             "village"
+//                                         ) ||
+//                                             "Village"}
+//                                     </label>
+
+//                                     <input
+//                                         type="text"
+//                                         name="village"
+//                                         value={
+//                                             profile.village
+//                                         }
+//                                         onChange={
+//                                             handleChange
+//                                         }
+//                                         placeholder={
+//                                             t(
+//                                                 "village"
+//                                             ) ||
+//                                             "Village"
+//                                         }
+//                                         className={
+//                                             inputClass
+//                                         }
+//                                     />
+//                                 </div>
+
+//                                 {/* PIN CODE */}
+
+//                                 <div>
+//                                     <label
+//                                         className={
+//                                             labelClass
+//                                         }
+//                                     >
+//                                         {t(
+//                                             "pin_code"
+//                                         ) ||
+//                                             "PIN Code"}
+//                                     </label>
+
+//                                     <input
+//                                         type="text"
+//                                         name="pincode"
+//                                         value={
+//                                             profile.pincode
+//                                         }
+//                                         onChange={
+//                                             handleChange
+//                                         }
+//                                         placeholder="533001"
+//                                         className={
+//                                             inputClass
+//                                         }
+//                                     />
+//                                 </div>
+//                             </div>
+
+//                             {/* GPS LOCATION */}
+
+//                             <div
+//                                 className="
+//                                     rounded-2xl
+//                                     border
+//                                     border-gray-200
+//                                     bg-[#f7faf8]
+//                                     p-5
+//                                 "
+//                             >
+//                                 <div
+//                                     className="
+//                                         flex
+//                                         flex-col
+//                                         md:flex-row
+//                                         md:items-center
+//                                         md:justify-between
+//                                         gap-5
+//                                     "
+//                                 >
+//                                     <div
+//                                         className="
+//                                             flex
+//                                             items-start
+//                                             gap-4
+//                                         "
+//                                     >
+//                                         <div
+//                                             className="
+//                                                 w-12
+//                                                 h-12
+//                                                 rounded-xl
+//                                                 bg-white
+//                                                 border
+//                                                 border-gray-200
+//                                                 flex
+//                                                 items-center
+//                                                 justify-center
+//                                             "
+//                                         >
+//                                             <MapPin
+//                                                 size={22}
+//                                                 className="text-[#345064]"
+//                                             />
+//                                         </div>
+
+//                                         <div>
+//                                             <h3
+//                                                 className="
+//                                                     font-bold
+//                                                     text-[#345064]
+//                                                 "
+//                                             >
+//                                                 {t(
+//                                                     "gps_location"
+//                                                 ) ||
+//                                                     "GPS Location"}
+//                                             </h3>
+
+//                                             <p
+//                                                 className="
+//                                                     text-sm
+//                                                     text-gray-500
+//                                                     mt-1
+//                                                     max-w-xl
+//                                                 "
+//                                             >
+//                                                 {t(
+//                                                     "gps_description"
+//                                                 ) ||
+//                                                     "Use your current location to automatically detect your farm coordinates."}
+//                                             </p>
+//                                         </div>
+//                                     </div>
+
+//                                     <button
+//                                         type="button"
+//                                         onClick={
+//                                             getCurrentLocation
+//                                         }
+//                                         disabled={
+//                                             loading
+//                                         }
+//                                         className="
+//                                             h-11
+//                                             px-5
+//                                             rounded-xl
+//                                             bg-[#345064]
+//                                             text-white
+//                                             font-semibold
+//                                             flex
+//                                             items-center
+//                                             justify-center
+//                                             gap-2
+//                                             hover:bg-[#274b5d]
+//                                             transition
+//                                             disabled:opacity-50
+//                                         "
+//                                     >
+//                                         <MapPin
+//                                             size={17}
+//                                         />
+
+//                                         {t(
+//                                             "detect_location"
+//                                         ) ||
+//                                             "Detect Location"}
+//                                     </button>
+//                                 </div>
+
+//                                 {(profile.latitude ||
+//                                     profile.longitude) && (
+//                                     <div
+//                                         className="
+//                                             mt-5
+//                                             pt-4
+//                                             border-t
+//                                             border-gray-200
+//                                             grid
+//                                             md:grid-cols-2
+//                                             gap-3
+//                                             text-sm
+//                                             text-gray-600
+//                                         "
+//                                     >
+//                                         <div>
+//                                             {t(
+//                                                 "latitude"
+//                                             ) ||
+//                                                 "Latitude"}
+//                                             :
+
+//                                             <strong className="ml-1">
+//                                                 {
+//                                                     profile.latitude
+//                                                 }
+//                                             </strong>
+//                                         </div>
+
+//                                         <div>
+//                                             {t(
+//                                                 "longitude"
+//                                             ) ||
+//                                                 "Longitude"}
+//                                             :
+
+//                                             <strong className="ml-1">
+//                                                 {
+//                                                     profile.longitude
+//                                                 }
+//                                             </strong>
+//                                         </div>
+//                                     </div>
+//                                 )}
+//                             </div>
+//                         </motion.div>
+//                     )}
+
+//                     {/* =================================================
+//                        STEP 3 — FARM
+//                     ================================================= */}
+
+//                     {step === 3 && (
+//                         <motion.div
+//                             initial={{
+//                                 opacity: 0,
+//                                 x: 20
+//                             }}
+//                             animate={{
+//                                 opacity: 1,
+//                                 x: 0
+//                             }}
+//                             className="space-y-7"
+//                         >
+//                             <div>
+//                                 <h2
+//                                     className="
+//                                         text-2xl
+//                                         md:text-3xl
+//                                         font-bold
+//                                         text-[#172c25]
+//                                     "
+//                                 >
+//                                     {t(
+//                                         "farm_information"
+//                                     ) ||
+//                                         "Farm Information"}
+//                                 </h2>
+
+//                                 <p
+//                                     className="
+//                                         text-gray-500
+//                                         mt-2
+//                                     "
+//                                 >
+//                                     {t(
+//                                         "farm_information_desc"
+//                                     ) ||
+//                                         "Tell us about your farm."}
+//                                 </p>
+//                             </div>
+
+//                             <div
+//                                 className="
+//                                     grid
+//                                     md:grid-cols-2
+//                                     gap-5
+//                                 "
+//                             >
+//                                 {/* FARM NAME */}
+
+//                                 <div>
+//                                     <label
+//                                         className={`
+//                                             ${labelClass}
+//                                             flex
+//                                             items-center
+//                                             gap-2
+//                                         `}
+//                                     >
+//                                         <Tractor
+//                                             size={17}
+//                                             className="text-[#087443]"
+//                                         />
+
+//                                         {t(
+//                                             "farm_name"
+//                                         ) ||
+//                                             "Farm Name"}
+
+//                                         <span className="text-red-500">
+//                                             *
+//                                         </span>
+//                                     </label>
+
+//                                     <input
+//                                         type="text"
+//                                         name="farmName"
+//                                         value={
+//                                             profile.farmName
+//                                         }
+//                                         onChange={
+//                                             handleChange
+//                                         }
+//                                         placeholder="My Farm"
+//                                         className={
+//                                             inputClass
+//                                         }
+//                                     />
+//                                 </div>
+
+//                                 {/* TOTAL LAND */}
+
+//                                 <div>
+//                                     <label
+//                                         className={
+//                                             labelClass
+//                                         }
+//                                     >
+//                                         {t(
+//                                             "total_land"
+//                                         ) ||
+//                                             "Total Land"}
+//                                     </label>
+
+//                                     <div className="flex gap-2">
+//                                         <input
+//                                             type="number"
+//                                             name="landArea"
+//                                             value={
+//                                                 profile.landArea
+//                                             }
+//                                             onChange={
+//                                                 handleChange
+//                                             }
+//                                             placeholder="5"
+//                                             min="0"
+//                                             step="0.01"
+//                                             className={
+//                                                 inputClass
+//                                             }
+//                                         />
+
+//                                         <select
+//                                             name="landUnit"
+//                                             value={
+//                                                 profile.landUnit
+//                                             }
+//                                             onChange={
+//                                                 handleChange
+//                                             }
+//                                             className={`
+//                                                 ${inputClass}
+//                                                 max-w-[145px]
+//                                             `}
+//                                         >
+//                                             <option value="Acres">
+//                                                 {t(
+//                                                     "acres"
+//                                                 ) ||
+//                                                     "Acres"}
+//                                             </option>
+
+//                                             <option value="Hectares">
+//                                                 {t(
+//                                                     "hectares"
+//                                                 ) ||
+//                                                     "Hectares"}
+//                                             </option>
+//                                         </select>
+//                                     </div>
+//                                 </div>
+
+//                                 {/* SOIL TYPE */}
+
+//                                 <div>
+//                                     <label
+//                                         className={`
+//                                             ${labelClass}
+//                                             flex
+//                                             items-center
+//                                             gap-2
+//                                         `}
+//                                     >
+//                                         <Mountain
+//                                             size={17}
+//                                             className="text-[#087443]"
+//                                         />
+
+//                                         {t(
+//                                             "soil_type"
+//                                         ) ||
+//                                             "Soil Type"}
+//                                     </label>
+
+//                                     <select
+//                                         name="soilType"
+//                                         value={
+//                                             profile.soilType
+//                                         }
+//                                         onChange={
+//                                             handleChange
+//                                         }
+//                                         className={
+//                                             inputClass
+//                                         }
+//                                     >
+//                                         <option value="">
+//                                             {t(
+//                                                 "select_soil"
+//                                             ) ||
+//                                                 "Select Soil"}
+//                                         </option>
+
+//                                         <option value="Black Soil">
+//                                             {t(
+//                                                 "black_soil"
+//                                             ) ||
+//                                                 "Black Soil"}
+//                                         </option>
+
+//                                         <option value="Red Soil">
+//                                             {t(
+//                                                 "red_soil"
+//                                             ) ||
+//                                                 "Red Soil"}
+//                                         </option>
+
+//                                         <option value="Clay Soil">
+//                                             {t(
+//                                                 "clay_soil"
+//                                             ) ||
+//                                                 "Clay Soil"}
+//                                         </option>
+
+//                                         <option value="Alluvial Soil">
+//                                             {t(
+//                                                 "alluvial_soil"
+//                                             ) ||
+//                                                 "Alluvial Soil"}
+//                                         </option>
+
+//                                         <option value="Laterite Soil">
+//                                             {t(
+//                                                 "laterite_soil"
+//                                             ) ||
+//                                                 "Laterite Soil"}
+//                                         </option>
+
+//                                         <option value="Sandy Soil">
+//                                             {t(
+//                                                 "sandy_soil"
+//                                             ) ||
+//                                                 "Sandy Soil"}
+//                                         </option>
+//                                     </select>
+//                                 </div>
+
+//                                 {/* IRRIGATION */}
+
+//                                 <div>
+//                                     <label
+//                                         className={`
+//                                             ${labelClass}
+//                                             flex
+//                                             items-center
+//                                             gap-2
+//                                         `}
+//                                     >
+//                                         <Droplets
+//                                             size={17}
+//                                             className="text-[#087443]"
+//                                         />
+
+//                                         {t(
+//                                             "irrigation_type"
+//                                         ) ||
+//                                             "Irrigation Type"}
+//                                     </label>
+
+//                                     <select
+//                                         name="irrigationType"
+//                                         value={
+//                                             profile.irrigationType
+//                                         }
+//                                         onChange={
+//                                             handleChange
+//                                         }
+//                                         className={
+//                                             inputClass
+//                                         }
+//                                     >
+//                                         <option value="">
+//                                             {t(
+//                                                 "select_irrigation"
+//                                             ) ||
+//                                                 "Select Irrigation"}
+//                                         </option>
+
+//                                         <option value="Drip Irrigation">
+//                                             {t(
+//                                                 "drip_irrigation"
+//                                             ) ||
+//                                                 "Drip Irrigation"}
+//                                         </option>
+
+//                                         <option value="Sprinkler">
+//                                             {t(
+//                                                 "sprinkler"
+//                                             ) ||
+//                                                 "Sprinkler"}
+//                                         </option>
+
+//                                         <option value="Canal">
+//                                             {t("canal") ||
+//                                                 "Canal"}
+//                                         </option>
+
+//                                         <option value="Rainfed">
+//                                             {t(
+//                                                 "rainfed"
+//                                             ) ||
+//                                                 "Rainfed"}
+//                                         </option>
+
+//                                         <option value="Borewell">
+//                                             {t(
+//                                                 "borewell"
+//                                             ) ||
+//                                                 "Borewell"}
+//                                         </option>
+//                                     </select>
+//                                 </div>
+
+//                                 {/* WATER SOURCE */}
+
+//                                 <div>
+//                                     <label
+//                                         className={
+//                                             labelClass
+//                                         }
+//                                     >
+//                                         {t(
+//                                             "water_source"
+//                                         ) ||
+//                                             "Water Source"}
+//                                     </label>
+
+//                                     <select
+//                                         name="waterSource"
+//                                         value={
+//                                             profile.waterSource
+//                                         }
+//                                         onChange={
+//                                             handleChange
+//                                         }
+//                                         className={
+//                                             inputClass
+//                                         }
+//                                     >
+//                                         <option value="">
+//                                             {t(
+//                                                 "select_water_source"
+//                                             ) ||
+//                                                 "Select Water Source"}
+//                                         </option>
+
+//                                         <option value="Borewell">
+//                                             {t(
+//                                                 "borewell"
+//                                             ) ||
+//                                                 "Borewell"}
+//                                         </option>
+
+//                                         <option value="River">
+//                                             {t("river") ||
+//                                                 "River"}
+//                                         </option>
+
+//                                         <option value="Canal">
+//                                             {t("canal") ||
+//                                                 "Canal"}
+//                                         </option>
+
+//                                         <option value="Pond">
+//                                             {t("pond") ||
+//                                                 "Pond"}
+//                                         </option>
+
+//                                         <option value="Rain Water">
+//                                             {t(
+//                                                 "rain_water"
+//                                             ) ||
+//                                                 "Rain Water"}
+//                                         </option>
+//                                     </select>
+//                                 </div>
+//                             </div>
+//                         </motion.div>
+//                     )}
+
+//                     {/* =================================================
+//                        STEP 4 — CROPS
+//                     ================================================= */}
+
+//                     {step === 4 && (
+//                         <motion.div
+//                             initial={{
+//                                 opacity: 0,
+//                                 x: 20
+//                             }}
+//                             animate={{
+//                                 opacity: 1,
+//                                 x: 0
+//                             }}
+//                             className="space-y-7"
+//                         >
+//                             <div>
+//                                 <h2
+//                                     className="
+//                                         text-2xl
+//                                         md:text-3xl
+//                                         font-bold
+//                                         text-[#172c25]
+//                                     "
+//                                 >
+//                                     {t(
+//                                         "crop_information"
+//                                     ) ||
+//                                         "Crop Information"}
+//                                 </h2>
+
+//                                 <p
+//                                     className="
+//                                         text-gray-500
+//                                         mt-2
+//                                     "
+//                                 >
+//                                     {t(
+//                                         "crop_information_desc"
+//                                     ) ||
+//                                         "Tell us about the crops you grow."}
+//                                 </p>
+//                             </div>
+
+//                             <div
+//                                 className="
+//                                     grid
+//                                     md:grid-cols-2
+//                                     gap-5
+//                                 "
+//                             >
+//                                 {/* PRIMARY CROP */}
+
+//                                 <div>
+//                                     <label
+//                                         className={`
+//                                             ${labelClass}
+//                                             flex
+//                                             items-center
+//                                             gap-2
+//                                         `}
+//                                     >
+//                                         <Sprout
+//                                             size={17}
+//                                             className="text-[#087443]"
+//                                         />
+
+//                                         {t(
+//                                             "primary_crop"
+//                                         ) ||
+//                                             "Primary Crop"}
+
+//                                         <span className="text-red-500">
+//                                             *
+//                                         </span>
+//                                     </label>
+
+//                                     <select
+//                                         name="primaryCrop"
+//                                         value={
+//                                             profile.primaryCrop
+//                                         }
+//                                         onChange={
+//                                             handleChange
+//                                         }
+//                                         className={
+//                                             inputClass
+//                                         }
+//                                     >
+//                                         <option value="">
+//                                             {t(
+//                                                 "select_crop"
+//                                             ) ||
+//                                                 "Select Crop"}
+//                                         </option>
+
+//                                         <option value="Rice">
+//                                             {t("rice") ||
+//                                                 "Rice"}
+//                                         </option>
+
+//                                         <option value="Maize">
+//                                             {t("maize") ||
+//                                                 "Maize"}
+//                                         </option>
+
+//                                         <option value="Cotton">
+//                                             {t(
+//                                                 "cotton"
+//                                             ) ||
+//                                                 "Cotton"}
+//                                         </option>
+
+//                                         <option value="Groundnut">
+//                                             {t(
+//                                                 "groundnut"
+//                                             ) ||
+//                                                 "Groundnut"}
+//                                         </option>
+
+//                                         <option value="Sugarcane">
+//                                             {t(
+//                                                 "sugarcane"
+//                                             ) ||
+//                                                 "Sugarcane"}
+//                                         </option>
+
+//                                         <option value="Tomato">
+//                                             {t(
+//                                                 "tomato"
+//                                             ) ||
+//                                                 "Tomato"}
+//                                         </option>
+
+//                                         <option value="Potato">
+//                                             {t(
+//                                                 "potato"
+//                                             ) ||
+//                                                 "Potato"}
+//                                         </option>
+
+//                                         <option value="Chilli">
+//                                             {t(
+//                                                 "chilli"
+//                                             ) ||
+//                                                 "Chilli"}
+//                                         </option>
+
+//                                         <option value="Wheat">
+//                                             {t("wheat") ||
+//                                                 "Wheat"}
+//                                         </option>
+//                                     </select>
+//                                 </div>
+
+//                                 {/* SECONDARY CROP */}
+
+//                                 <div>
+//                                     <label
+//                                         className={
+//                                             labelClass
+//                                         }
+//                                     >
+//                                         {t(
+//                                             "secondary_crop"
+//                                         ) ||
+//                                             "Secondary Crop"}
+//                                     </label>
+
+//                                     <input
+//                                         type="text"
+//                                         name="secondaryCrop"
+//                                         value={
+//                                             profile.secondaryCrop
+//                                         }
+//                                         onChange={
+//                                             handleChange
+//                                         }
+//                                         placeholder={
+//                                             t(
+//                                                 "optional"
+//                                             ) ||
+//                                             "Optional"
+//                                         }
+//                                         className={
+//                                             inputClass
+//                                         }
+//                                     />
+//                                 </div>
+
+//                                 {/* FARMING TYPE */}
+
+//                                 <div>
+//                                     <label
+//                                         className={
+//                                             labelClass
+//                                         }
+//                                     >
+//                                         {t(
+//                                             "farming_type"
+//                                         ) ||
+//                                             "Farming Type"}
+//                                     </label>
+
+//                                     <select
+//                                         name="farmingType"
+//                                         value={
+//                                             profile.farmingType
+//                                         }
+//                                         onChange={
+//                                             handleChange
+//                                         }
+//                                         className={
+//                                             inputClass
+//                                         }
+//                                     >
+//                                         <option value="">
+//                                             {t(
+//                                                 "select_farming_type"
+//                                             ) ||
+//                                                 "Select Farming Type"}
+//                                         </option>
+
+//                                         <option value="Organic">
+//                                             {t(
+//                                                 "organic"
+//                                             ) ||
+//                                                 "Organic"}
+//                                         </option>
+
+//                                         <option value="Conventional">
+//                                             {t(
+//                                                 "conventional"
+//                                             ) ||
+//                                                 "Conventional"}
+//                                         </option>
+
+//                                         <option value="Mixed">
+//                                             {t("mixed") ||
+//                                                 "Mixed"}
+//                                         </option>
+//                                     </select>
+//                                 </div>
+
+//                                 {/* EXPERIENCE */}
+
+//                                 <div>
+//                                     <label
+//                                         className={
+//                                             labelClass
+//                                         }
+//                                     >
+//                                         {t(
+//                                             "farming_experience"
+//                                         ) ||
+//                                             "Farming Experience"}
+//                                     </label>
+
+//                                     <input
+//                                         type="number"
+//                                         name="farmingExperience"
+//                                         value={
+//                                             profile.farmingExperience
+//                                         }
+//                                         onChange={
+//                                             handleChange
+//                                         }
+//                                         placeholder="10"
+//                                         min="0"
+//                                         className={
+//                                             inputClass
+//                                         }
+//                                     />
+//                                 </div>
+
+//                                 {/* LIVESTOCK */}
+
+//                                 <div className="md:col-span-2">
+//                                     <label
+//                                         className={
+//                                             labelClass
+//                                         }
+//                                     >
+//                                         {t(
+//                                             "livestock"
+//                                         ) ||
+//                                             "Livestock"}
+//                                     </label>
+
+//                                     <input
+//                                         type="text"
+//                                         name="livestock"
+//                                         value={
+//                                             profile.livestock
+//                                         }
+//                                         onChange={
+//                                             handleChange
+//                                         }
+//                                         placeholder={
+//                                             t(
+//                                                 "livestock_placeholder"
+//                                             ) ||
+//                                             "Example: Cows, Buffaloes"
+//                                         }
+//                                         className={
+//                                             inputClass
+//                                         }
+//                                     />
+//                                 </div>
+//                             </div>
+
+//                             {/* ALMOST DONE CARD */}
+
+//                             <div
+//                                 className="
+//                                     rounded-2xl
+//                                     border
+//                                     border-[#d8eee1]
+//                                     bg-[#f1f8f4]
+//                                     p-5
+//                                 "
+//                             >
+//                                 <div
+//                                     className="
+//                                         flex
+//                                         items-start
+//                                         gap-4
+//                                     "
+//                                 >
+//                                     <div
+//                                         className="
+//                                             w-12
+//                                             h-12
+//                                             rounded-xl
+//                                             bg-white
+//                                             flex
+//                                             items-center
+//                                             justify-center
+//                                             shrink-0
+//                                             border
+//                                             border-[#d8eee1]
+//                                         "
+//                                     >
+//                                         <CheckCircle
+//                                             size={23}
+//                                             className="text-[#087443]"
+//                                         />
+//                                     </div>
+
+//                                     <div>
+//                                         <h3
+//                                             className="
+//                                                 font-bold
+//                                                 text-[#087443]
+//                                                 text-lg
+//                                             "
+//                                         >
+//                                             {t(
+//                                                 "almost_done"
+//                                             ) ||
+//                                                 "Almost Done"}
+//                                         </h3>
+
+//                                         <p
+//                                             className="
+//                                                 text-gray-600
+//                                                 mt-1.5
+//                                             "
+//                                         >
+//                                             {t(
+//                                                 "almost_done_desc"
+//                                             ) ||
+//                                                 "Save your profile to personalize your FarmXpert dashboard."}
+//                                         </p>
+//                                     </div>
+//                                 </div>
+//                             </div>
+//                         </motion.div>
+//                     )}
+
+//                     {/* =================================================
+//                        NAVIGATION
+//                     ================================================= */}
+
+//                     <div
+//                         className="
+//                             mt-10
+//                             pt-6
+//                             border-t
+//                             border-gray-100
+//                         "
+//                     >
+//                         <div
+//                             className="
+//                                 flex
+//                                 flex-col
+//                                 sm:flex-row
+//                                 sm:items-center
+//                                 sm:justify-between
+//                                 gap-4
+//                             "
+//                         >
+//                             {/* LEFT */}
+
+//                             <div
+//                                 className="
+//                                     flex
+//                                     items-center
+//                                     gap-3
+//                                 "
+//                             >
+//                                 {/* PREVIOUS */}
+
+//                                 {step > 1 ? (
+//                                     <button
+//                                         type="button"
+//                                         onClick={
+//                                             previousStep
+//                                         }
+//                                         disabled={
+//                                             loading
+//                                         }
+//                                         className="
+//                                             h-11
+//                                             px-5
+//                                             rounded-xl
+//                                             border
+//                                             border-gray-200
+//                                             bg-white
+//                                             text-gray-700
+//                                             font-semibold
+//                                             flex
+//                                             items-center
+//                                             gap-2
+//                                             hover:bg-gray-50
+//                                             transition
+//                                             disabled:opacity-50
+//                                         "
+//                                     >
+//                                         <ArrowLeft
+//                                             size={17}
+//                                         />
+
+//                                         {t(
+//                                             "previous"
+//                                         ) ||
+//                                             "Previous"}
+//                                     </button>
+//                                 ) : (
+//                                     <div />
+//                                 )}
+
+//                                 {/* SKIP */}
+
+//                                 <button
+//                                     type="button"
+//                                     onClick={
+//                                         skipProfile
+//                                     }
+//                                     disabled={
+//                                         loading
+//                                     }
+//                                     className="
+//                                         h-11
+//                                         px-5
+//                                         rounded-xl
+//                                         text-gray-500
+//                                         font-medium
+//                                         hover:text-[#087443]
+//                                         hover:bg-[#f3f7f5]
+//                                         transition
+//                                         disabled:opacity-50
+//                                     "
+//                                 >
+//                                     {t(
+//                                         "skip_for_now"
+//                                     ) ||
+//                                         "Skip for now"}
+//                                 </button>
+//                             </div>
+
+//                             {/* RIGHT */}
+
+//                             {step < totalSteps ? (
+//                                 <button
+//                                     type="button"
+//                                     onClick={
+//                                         nextStep
+//                                     }
+//                                     disabled={
+//                                         loading
+//                                     }
+//                                     className="
+//                                         h-11
+//                                         px-6
+//                                         rounded-xl
+//                                         bg-[#087443]
+//                                         text-white
+//                                         font-semibold
+//                                         flex
+//                                         items-center
+//                                         justify-center
+//                                         gap-2
+//                                         shadow-[0_5px_15px_rgba(8,116,67,0.18)]
+//                                         hover:bg-[#076538]
+//                                         hover:-translate-y-0.5
+//                                         transition-all
+//                                         disabled:opacity-50
+//                                     "
+//                                 >
+//                                     {t("next") ||
+//                                         "Next"}
+
+//                                     <ArrowRight
+//                                         size={18}
+//                                     />
+//                                 </button>
+//                             ) : (
+//                                 <button
+//                                     type="button"
+//                                     onClick={
+//                                         saveProfile
+//                                     }
+//                                     disabled={
+//                                         loading
+//                                     }
+//                                     className="
+//                                         h-11
+//                                         px-6
+//                                         rounded-xl
+//                                         bg-[#087443]
+//                                         text-white
+//                                         font-semibold
+//                                         flex
+//                                         items-center
+//                                         justify-center
+//                                         gap-2
+//                                         shadow-[0_5px_15px_rgba(8,116,67,0.18)]
+//                                         hover:bg-[#076538]
+//                                         hover:-translate-y-0.5
+//                                         transition-all
+//                                         disabled:opacity-60
+//                                         disabled:cursor-not-allowed
+//                                     "
+//                                 >
+//                                     {loading ? (
+//                                         <>
+//                                             <Loader2
+//                                                 size={18}
+//                                                 className="
+//                                                     animate-spin
+//                                                 "
+//                                             />
+
+//                                             {t(
+//                                                 "saving"
+//                                             ) ||
+//                                                 "Saving..."}
+//                                         </>
+//                                     ) : (
+//                                         <>
+//                                             {t(
+//                                                 "save_profile"
+//                                             ) ||
+//                                                 "Save Profile"}
+
+//                                             <CheckCircle
+//                                                 size={18}
+//                                             />
+//                                         </>
+//                                     )}
+//                                 </button>
+//                             )}
+//                         </div>
+//                     </div>
+
+//                     {/* =================================================
+//                        FOOTER
+//                     ================================================= */}
+
+//                     <div
+//                         className="
+//                             mt-7
+//                             text-center
+//                         "
+//                     >
+//                         <p
+//                             className="
+//                                 text-xs
+//                                 md:text-sm
+//                                 text-gray-400
+//                             "
+//                         >
+//                             {t(
+//                                 "profile_footer"
+//                             ) ||
+//                                 "You can update these details anytime from My Profile."}
+//                         </p>
+//                     </div>
+//                 </div>
+//             </motion.div>
+//         </div>
+//     );
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -9378,402 +11803,797 @@ import { useTranslation } from "react-i18next";
 import api from "../api";
 
 export default function FarmerProfile() {
-    const navigate = useNavigate();
-    const { t, i18n } = useTranslation();
 
-    const [loading, setLoading] = useState(false);
-    const [isLoadingProfile, setIsLoadingProfile] = useState(true);
-    const [step, setStep] = useState(1);
+    const navigate = useNavigate();
+
+    const {
+        t,
+        i18n
+    } = useTranslation();
+
+
+    const [loading, setLoading] =
+        useState(false);
+
+    const [isLoadingProfile, setIsLoadingProfile] =
+        useState(true);
+
+    const [step, setStep] =
+        useState(1);
+
 
     const totalSteps = 4;
 
-    const [profile, setProfile] = useState({
-        fullName: "",
-        mobile: "",
-        gender: "",
-        age: "",
 
-        state: "",
-        district: "",
-        village: "",
-        pincode: "",
+    const [profile, setProfile] =
+        useState({
 
-        latitude: "",
-        longitude: "",
+            fullName: "",
+            mobile: "",
+            gender: "",
+            age: "",
 
-        farmName: "",
-        landArea: "",
-        landUnit: "Acres",
+            state: "",
+            district: "",
+            village: "",
+            pincode: "",
 
-        soilType: "",
-        irrigationType: "",
-        waterSource: "",
+            latitude: "",
+            longitude: "",
 
-        primaryCrop: "",
-        secondaryCrop: "",
+            farmName: "",
+            landArea: "",
+            landUnit: "Acres",
 
-        farmingType: "",
-        farmingExperience: "",
+            soilType: "",
+            irrigationType: "",
+            waterSource: "",
 
-        livestock: "",
-        language: "en"
-    });
+            primaryCrop: "",
+            secondaryCrop: "",
+
+            farmingType: "",
+            farmingExperience: "",
+
+            livestock: "",
+            language: "en"
+
+        });
+
 
     /* =========================================================
        LANGUAGE CHANGE REFRESH
     ========================================================= */
 
-    const [, setLanguageVersion] = useState(0);
+    const [, setLanguageVersion] =
+        useState(0);
+
 
     useEffect(() => {
-        const handleLanguageChange = () => {
-            setLanguageVersion((previous) => previous + 1);
-        };
 
-        i18n.on("languageChanged", handleLanguageChange);
+        const handleLanguageChange =
+            () => {
+
+                setLanguageVersion(
+                    previous =>
+                        previous + 1
+                );
+
+                document.documentElement.lang =
+                    i18n.resolvedLanguage ||
+                    i18n.language ||
+                    "en";
+            };
+
+
+        i18n.on(
+            "languageChanged",
+            handleLanguageChange
+        );
+
 
         return () => {
-            i18n.off("languageChanged", handleLanguageChange);
+
+            i18n.off(
+                "languageChanged",
+                handleLanguageChange
+            );
+
         };
+
     }, [i18n]);
+
 
     /* =========================================================
        CHECK EXISTING PROFILE
     ========================================================= */
 
     useEffect(() => {
+
         checkExistingProfile();
+
     }, []);
 
-    const checkExistingProfile = async () => {
-        try {
-            setIsLoadingProfile(true);
 
-            const response = await api.get("/farmer/check");
+    const checkExistingProfile =
+        async () => {
 
-            console.log("Profile check:", response.data);
+            try {
 
-            /* PROFILE ALREADY COMPLETED */
+                setIsLoadingProfile(
+                    true
+                );
 
-            if (
-                response.data.exists === true &&
-                response.data.isComplete === true
-            ) {
-                navigate("/dashboard");
-                return;
-            }
 
-            /* PROFILE EXISTS BUT IS INCOMPLETE */
+                const response =
+                    await api.get(
+                        "/farmer/check"
+                    );
 
-            if (
-                response.data.exists === true &&
-                response.data.isComplete === false
-            ) {
-                const existingProfile =
-                    response.data.profile || {};
 
-                setProfile((previous) => ({
-                    ...previous,
-                    ...existingProfile
-                }));
+                console.log(
+                    "Profile check:",
+                    response.data
+                );
 
-                /* Restore saved language */
 
-                if (existingProfile.language) {
-                    const savedLanguage =
-                        existingProfile.language;
+                /* PROFILE ALREADY COMPLETED */
 
-                    if (
-                        savedLanguage !== i18n.language
-                    ) {
-                        await i18n.changeLanguage(
-                            savedLanguage
-                        );
-                    }
+                if (
+                    response.data.exists === true &&
+                    response.data.isComplete === true
+                ) {
+
+                    navigate(
+                        "/dashboard"
+                    );
+
+                    return;
+
                 }
+
+
+                /* PROFILE EXISTS BUT IS INCOMPLETE */
+
+                if (
+                    response.data.exists === true &&
+                    response.data.isComplete === false
+                ) {
+
+                    const existingProfile =
+                        response.data.profile || {};
+
+
+                    /*
+                     * IMPORTANT:
+                     *
+                     * DO NOT do this:
+                     *
+                     * i18n.changeLanguage(
+                     *     existingProfile.language
+                     * );
+                     *
+                     * The backend can contain an old language
+                     * such as "en".
+                     *
+                     * DashboardTopbar is already controlling the
+                     * currently selected application language.
+                     *
+                     * Therefore opening FarmerProfile must NOT
+                     * reset Telugu/Hindi back to English.
+                     */
+
+
+                    const activeLanguage =
+                        i18n.resolvedLanguage ||
+                        i18n.language ||
+                        existingProfile.language ||
+                        "en";
+
+
+                    setProfile(
+                        previous => ({
+
+                            ...previous,
+
+                            ...existingProfile,
+
+                            language:
+                                activeLanguage
+
+                        })
+                    );
+
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "Error checking profile:",
+                    error
+                );
+
+            } finally {
+
+                setIsLoadingProfile(
+                    false
+                );
+
             }
-        } catch (error) {
-            console.error(
-                "Error checking profile:",
-                error
-            );
-        } finally {
-            setIsLoadingProfile(false);
-        }
-    };
+
+        };
+
 
     /* =========================================================
        LANGUAGE SELECTOR
     ========================================================= */
 
-    const handleLanguageChange = async (e) => {
-        const selectedLanguage = e.target.value;
+    const handleLanguageChange =
+        async (e) => {
 
-        try {
-            await i18n.changeLanguage(
-                selectedLanguage
-            );
+            const selectedLanguage =
+                e.target.value;
 
-            setProfile((previous) => ({
-                ...previous,
-                language: selectedLanguage
-            }));
-        } catch (error) {
-            console.error(
-                "Language change error:",
-                error
-            );
 
-            toast.error(
-                "Unable to change language."
-            );
-        }
-    };
+            try {
+
+                await i18n.changeLanguage(
+                    selectedLanguage
+                );
+
+
+                setProfile(
+                    previous => ({
+
+                        ...previous,
+
+                        language:
+                            selectedLanguage
+
+                    })
+                );
+
+
+                /*
+                 * Keep browser language synchronized.
+                 */
+
+                document.documentElement.lang =
+                    selectedLanguage;
+
+
+                /*
+                 * Save language for the current user.
+                 */
+
+                try {
+
+                    const {
+                        saveUserLanguage
+                    } = await import(
+                        "../utils/userLanguage"
+                    );
+
+
+                    saveUserLanguage(
+                        selectedLanguage
+                    );
+
+                } catch (
+                    storageError
+                ) {
+
+                    console.error(
+                        "Unable to save user language:",
+                        storageError
+                    );
+
+                }
+
+
+                /*
+                 * Notify DashboardTopbar and other
+                 * components immediately.
+                 */
+
+                window.dispatchEvent(
+                    new CustomEvent(
+                        "farmxpert:languageChanged",
+                        {
+                            detail: {
+                                language:
+                                    selectedLanguage
+                            }
+                        }
+                    )
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Language change error:",
+                    error
+                );
+
+
+                toast.error(
+                    "Unable to change language."
+                );
+
+            }
+
+        };
+
 
     /* =========================================================
        INPUT CHANGE
     ========================================================= */
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
+    const handleChange =
+        (e) => {
 
-        setProfile((previous) => ({
-            ...previous,
-            [name]: value
-        }));
-    };
+            const {
+                name,
+                value
+            } = e.target;
+
+
+            setProfile(
+                previous => ({
+
+                    ...previous,
+
+                    [name]:
+                        value
+
+                })
+            );
+
+        };
+
 
     /* =========================================================
        CURRENT LOCATION
     ========================================================= */
 
-    const getCurrentLocation = () => {
-        if (!navigator.geolocation) {
-            toast.error(
-                t("location_not_supported") ||
-                    "Location is not supported by your browser."
-            );
+    const getCurrentLocation =
+        () => {
 
-            return;
-        }
-
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                setProfile((previous) => ({
-                    ...previous,
-                    latitude:
-                        position.coords.latitude,
-                    longitude:
-                        position.coords.longitude
-                }));
-
-                toast.success(
-                    t("location_detected") ||
-                        "Location detected successfully."
-                );
-            },
-            (error) => {
-                console.error(
-                    "Location error:",
-                    error
-                );
+            if (
+                !navigator.geolocation
+            ) {
 
                 toast.error(
-                    t("location_detection_failed") ||
-                        "Unable to detect your location."
+                    t(
+                        "location_not_supported"
+                    ) ||
+                    "Location is not supported by your browser."
                 );
-            },
-            {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0
+
+
+                return;
+
             }
-        );
-    };
+
+
+            navigator.geolocation.getCurrentPosition(
+
+                (position) => {
+
+                    setProfile(
+                        previous => ({
+
+                            ...previous,
+
+                            latitude:
+                                position.coords.latitude,
+
+                            longitude:
+                                position.coords.longitude
+
+                        })
+                    );
+
+
+                    toast.success(
+                        t(
+                            "location_detected"
+                        ) ||
+                        "Location detected successfully."
+                    );
+
+                },
+
+                (error) => {
+
+                    console.error(
+                        "Location error:",
+                        error
+                    );
+
+
+                    toast.error(
+                        t(
+                            "location_detection_failed"
+                        ) ||
+                        "Unable to detect your location."
+                    );
+
+                },
+
+                {
+                    enableHighAccuracy:
+                        true,
+
+                    timeout:
+                        10000,
+
+                    maximumAge:
+                        0
+                }
+
+            );
+
+        };
+
 
     /* =========================================================
        NEXT STEP
     ========================================================= */
 
-    const nextStep = () => {
-        if (step < totalSteps) {
-            setStep(
-                (previous) => previous + 1
-            );
-        }
-    };
+    const nextStep =
+        () => {
+
+            if (
+                step < totalSteps
+            ) {
+
+                setStep(
+                    previous =>
+                        previous + 1
+                );
+
+            }
+
+        };
+
 
     /* =========================================================
        PREVIOUS STEP
     ========================================================= */
 
-    const previousStep = () => {
-        if (step > 1) {
-            setStep(
-                (previous) => previous - 1
-            );
-        }
-    };
+    const previousStep =
+        () => {
+
+            if (
+                step > 1
+            ) {
+
+                setStep(
+                    previous =>
+                        previous - 1
+                );
+
+            }
+
+        };
+
 
     /* =========================================================
        SKIP PROFILE
     ========================================================= */
 
-    const skipProfile = async () => {
-        try {
-            setLoading(true);
+    const skipProfile =
+        async () => {
 
-            const response =
-                await api.post("/farmer/skip");
+            try {
 
-            console.log(
-                "Skip profile response:",
-                response.data
-            );
+                setLoading(
+                    true
+                );
 
-            toast.success(
-                t("profile_skipped") ||
+
+                const response =
+                    await api.post(
+                        "/farmer/skip"
+                    );
+
+
+                console.log(
+                    "Skip profile response:",
+                    response.data
+                );
+
+
+                toast.success(
+                    t(
+                        "profile_skipped"
+                    ) ||
                     "Profile skipped. You can complete it later."
-            );
+                );
 
-            navigate("/dashboard", {
-                state: {
-                    startGuidedTour: true
-                }
-            });
-        } catch (error) {
-            console.error(
-                "Skip profile error:",
-                error
-            );
 
-            toast.error(
-                error.response?.data?.error ||
+                navigate(
+                    "/dashboard",
+                    {
+                        state: {
+                            startGuidedTour:
+                                true
+                        }
+                    }
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Skip profile error:",
+                    error
+                );
+
+
+                toast.error(
+                    error.response?.data?.error ||
                     error.response?.data?.message ||
                     "Unable to skip profile."
-            );
-        } finally {
-            setLoading(false);
-        }
-    };
+                );
+
+            } finally {
+
+                setLoading(
+                    false
+                );
+
+            }
+
+        };
+
 
     /* =========================================================
        SAVE PROFILE
     ========================================================= */
 
-    const saveProfile = async () => {
-        try {
-            setLoading(true);
+    const saveProfile =
+        async () => {
 
-            const requiredFields = [
-                "fullName",
-                "mobile",
-                "state",
-                "district",
-                "farmName",
-                "primaryCrop"
-            ];
+            try {
 
-            const missingFields =
-                requiredFields.filter(
-                    (field) => {
-                        const value =
-                            profile[field];
+                setLoading(
+                    true
+                );
 
-                        return (
-                            !value ||
-                            String(value).trim() === ""
-                        );
+
+                const requiredFields = [
+
+                    "fullName",
+                    "mobile",
+                    "state",
+                    "district",
+                    "farmName",
+                    "primaryCrop"
+
+                ];
+
+
+                const missingFields =
+                    requiredFields.filter(
+                        field => {
+
+                            const value =
+                                profile[field];
+
+
+                            return (
+                                !value ||
+                                String(
+                                    value
+                                ).trim() === ""
+                            );
+
+                        }
+                    );
+
+
+                /* VALIDATION */
+
+                if (
+                    missingFields.length > 0
+                ) {
+
+                    toast.error(
+                        t(
+                            "please_fill_all_required_fields"
+                        ) ||
+                        "Please fill all required fields."
+                    );
+
+
+                    const stepMap = {
+
+                        fullName: 1,
+                        mobile: 1,
+                        state: 2,
+                        district: 2,
+                        farmName: 3,
+                        primaryCrop: 4
+
+                    };
+
+
+                    const firstMissingStep =
+                        stepMap[
+                            missingFields[0]
+                        ] || 1;
+
+
+                    setStep(
+                        firstMissingStep
+                    );
+
+
+                    setLoading(
+                        false
+                    );
+
+
+                    return;
+
+                }
+
+
+                /* =================================================
+                   CURRENT ACTIVE LANGUAGE
+                ================================================= */
+
+                const selectedLanguage =
+                    i18n.resolvedLanguage ||
+                    i18n.language ||
+                    profile.language ||
+                    "en";
+
+
+                /* PROFILE DATA */
+
+                const profileData = {
+
+                    ...profile,
+
+                    language:
+                        selectedLanguage
+
+                };
+
+
+                /* SAVE TO MONGODB */
+
+                const response =
+                    await api.post(
+                        "/farmer",
+                        profileData
+                    );
+
+
+                console.log(
+                    "Profile save response:",
+                    response.data
+                );
+
+
+                /*
+                 * Keep browser language synchronized.
+                 */
+
+                document.documentElement.lang =
+                    selectedLanguage;
+
+
+                /*
+                 * Save language for the current user.
+                 */
+
+                try {
+
+                    const {
+                        saveUserLanguage
+                    } = await import(
+                        "../utils/userLanguage"
+                    );
+
+
+                    saveUserLanguage(
+                        selectedLanguage
+                    );
+
+                } catch (
+                    storageError
+                ) {
+
+                    console.error(
+                        "Unable to save user language:",
+                        storageError
+                    );
+
+                }
+
+
+                /*
+                 * Tell other components that the
+                 * language has changed.
+                 */
+
+                window.dispatchEvent(
+                    new CustomEvent(
+                        "farmxpert:languageChanged",
+                        {
+                            detail: {
+                                language:
+                                    selectedLanguage
+                            }
+                        }
+                    )
+                );
+
+
+                toast.success(
+                    t(
+                        "profile_saved"
+                    ) ||
+                    "Profile saved successfully."
+                );
+
+
+                /* START GUIDED TOUR AFTER PROFILE */
+
+                navigate(
+                    "/dashboard",
+                    {
+                        state: {
+                            startGuidedTour:
+                                true
+                        }
                     }
                 );
 
-            /* VALIDATION */
 
-            if (missingFields.length > 0) {
-                toast.error(
-                    t(
-                        "please_fill_all_required_fields"
-                    ) ||
-                        "Please fill all required fields."
+            } catch (error) {
+
+                console.error(
+                    "Save profile error:",
+                    error
                 );
 
-                const stepMap = {
-                    fullName: 1,
-                    mobile: 1,
-                    state: 2,
-                    district: 2,
-                    farmName: 3,
-                    primaryCrop: 4
-                };
 
-                const firstMissingStep =
-                    stepMap[
-                        missingFields[0]
-                    ] || 1;
+                toast.error(
+                    error.response?.data?.error ||
+                    error.response?.data?.message ||
+                    t(
+                        "profile_save_failed"
+                    ) ||
+                    "Failed to save profile."
+                );
 
-                setStep(firstMissingStep);
+            } finally {
 
-                setLoading(false);
+                setLoading(
+                    false
+                );
 
-                return;
             }
 
-            /* PROFILE DATA */
+        };
 
-            const profileData = {
-                ...profile,
-                language:
-                    i18n.language
-            };
-
-            /* SAVE TO MONGODB */
-
-            const response =
-                await api.post(
-                    "/farmer",
-                    profileData
-                );
-
-            console.log(
-                "Profile save response:",
-                response.data
-            );
-
-            toast.success(
-                t("profile_saved") ||
-                    "Profile saved successfully."
-            );
-
-            /* START GUIDED TOUR AFTER PROFILE */
-
-            navigate("/dashboard", {
-                state: {
-                    startGuidedTour: true
-                }
-            });
-        } catch (error) {
-            console.error(
-                "Save profile error:",
-                error
-            );
-
-            toast.error(
-                error.response?.data?.error ||
-                    error.response?.data?.message ||
-                    t("profile_save_failed") ||
-                    "Failed to save profile."
-            );
-        } finally {
-            setLoading(false);
-        }
-    };
 
     /* =========================================================
        LOADING SCREEN
     ========================================================= */
 
-    if (isLoadingProfile) {
+    if (
+        isLoadingProfile
+    ) {
+
         return (
+
             <div
                 className="
                     min-h-screen
@@ -9783,7 +12603,13 @@ export default function FarmerProfile() {
                     bg-[#f5f8f6]
                 "
             >
-                <div className="text-center">
+
+                <div
+                    className="
+                        text-center
+                    "
+                >
+
                     <Loader2
                         className="
                             animate-spin
@@ -9794,6 +12620,7 @@ export default function FarmerProfile() {
                         "
                     />
 
+
                     <p
                         className="
                             mt-4
@@ -9801,13 +12628,24 @@ export default function FarmerProfile() {
                             font-medium
                         "
                     >
-                        {t("loading_profile") ||
-                            "Loading profile..."}
+
+                        {
+                            t(
+                                "loading_profile"
+                            ) ||
+                            "Loading profile..."
+                        }
+
                     </p>
+
                 </div>
+
             </div>
+
         );
+
     }
+
 
     /* =========================================================
        COMMON CLASSES
@@ -9829,6 +12667,7 @@ export default function FarmerProfile() {
         focus:ring-[#087443]/10
     `;
 
+
     const labelClass = `
         text-sm
         font-semibold
@@ -9837,11 +12676,13 @@ export default function FarmerProfile() {
         block
     `;
 
+
     /* =========================================================
        MAIN UI
     ========================================================= */
 
     return (
+
         <div
             className="
                 min-h-screen
@@ -9853,6 +12694,7 @@ export default function FarmerProfile() {
                 px-5
             "
         >
+
             <motion.div
                 initial={{
                     opacity: 0,
@@ -9876,6 +12718,7 @@ export default function FarmerProfile() {
                     overflow-hidden
                 "
             >
+
                 {/* =================================================
                    HEADER
                 ================================================= */}
@@ -9891,6 +12734,7 @@ export default function FarmerProfile() {
                         md:px-10
                     "
                 >
+
                     <div
                         className="
                             flex
@@ -9901,7 +12745,9 @@ export default function FarmerProfile() {
                             gap-5
                         "
                     >
+
                         <div>
+
                             <h1
                                 className="
                                     text-3xl
@@ -9910,9 +12756,16 @@ export default function FarmerProfile() {
                                     tracking-tight
                                 "
                             >
-                                {t("profile_title") ||
-                                    "Complete Farmer Profile"}
+
+                                {
+                                    t(
+                                        "profile_title"
+                                    ) ||
+                                    "Complete Farmer Profile"
+                                }
+
                             </h1>
+
 
                             <p
                                 className="
@@ -9922,10 +12775,18 @@ export default function FarmerProfile() {
                                     md:text-lg
                                 "
                             >
-                                {t("profile_subtitle") ||
-                                    "Help us personalize FarmXpert for your farm."}
+
+                                {
+                                    t(
+                                        "profile_subtitle"
+                                    ) ||
+                                    "Help us personalize FarmXpert for your farm."
+                                }
+
                             </p>
+
                         </div>
+
 
                         {/* =================================================
                            LANGUAGE SELECTOR
@@ -9940,7 +12801,11 @@ export default function FarmerProfile() {
                                 text-sm
                             "
                         >
-                            <Globe size={18} />
+
+                            <Globe
+                                size={18}
+                            />
+
 
                             <label
                                 htmlFor="profile-language"
@@ -9948,28 +12813,48 @@ export default function FarmerProfile() {
                                     whitespace-nowrap
                                 "
                             >
+
                                 {t(
                                     "select_language",
                                     "Language"
                                 )}
+
                             </label>
+
 
                             <select
                                 id="profile-language"
+
                                 value={
-                                    i18n.language?.startsWith(
+
+                                    (
+                                        i18n.resolvedLanguage ||
+                                        i18n.language ||
+                                        "en"
+                                    ).startsWith(
                                         "te"
                                     )
+
                                         ? "te"
-                                        : i18n.language?.startsWith(
-                                              "hi"
-                                          )
-                                        ? "hi"
-                                        : "en"
+
+                                        : (
+                                            i18n.resolvedLanguage ||
+                                            i18n.language ||
+                                            "en"
+                                        ).startsWith(
+                                            "hi"
+                                        )
+
+                                            ? "hi"
+
+                                            : "en"
+
                                 }
+
                                 onChange={
                                     handleLanguageChange
                                 }
+
                                 className="
                                     min-w-[125px]
                                     px-3
@@ -9987,30 +12872,50 @@ export default function FarmerProfile() {
                                     focus:ring-white/30
                                 "
                             >
+
                                 <option value="en">
-                                    {t(
-                                        "english",
-                                        "English"
-                                    )}
+
+                                    {
+                                        t(
+                                            "english",
+                                            "English"
+                                        )
+                                    }
+
                                 </option>
+
 
                                 <option value="te">
-                                    {t(
-                                        "telugu",
-                                        "Telugu"
-                                    )}
+
+                                    {
+                                        t(
+                                            "telugu",
+                                            "Telugu"
+                                        )
+                                    }
+
                                 </option>
 
+
                                 <option value="hi">
-                                    {t(
-                                        "hindi",
-                                        "Hindi"
-                                    )}
+
+                                    {
+                                        t(
+                                            "hindi",
+                                            "Hindi"
+                                        )
+                                    }
+
                                 </option>
+
                             </select>
+
                         </div>
+
                     </div>
+
                 </div>
+
 
                 {/* =================================================
                    PROGRESS
@@ -10023,6 +12928,7 @@ export default function FarmerProfile() {
                         pt-8
                     "
                 >
+
                     <div
                         className="
                             flex
@@ -10030,8 +12936,10 @@ export default function FarmerProfile() {
                             gap-2
                         "
                     >
+
                         {[1, 2, 3, 4].map(
-                            (item) => (
+                            item => (
+
                                 <div
                                     key={item}
                                     className="
@@ -10041,6 +12949,7 @@ export default function FarmerProfile() {
                                         flex-1
                                     "
                                 >
+
                                     <div
                                         className={`
                                             w-11
@@ -10054,22 +12963,31 @@ export default function FarmerProfile() {
                                             font-bold
                                             transition-all
                                             duration-300
+
                                             ${
-                                                step >=
-                                                item
+                                                step >= item
+
                                                     ? "bg-[#087443] text-white shadow-md"
+
                                                     : "bg-gray-100 text-gray-400"
                                             }
                                         `}
                                     >
-                                        {step > item ? (
-                                            <CheckCircle
-                                                size={20}
-                                            />
-                                        ) : (
-                                            item
-                                        )}
+
+                                        {
+                                            step > item
+
+                                                ? (
+                                                    <CheckCircle
+                                                        size={20}
+                                                    />
+                                                )
+
+                                                : item
+                                        }
+
                                     </div>
+
 
                                     <span
                                         className="
@@ -10081,32 +12999,55 @@ export default function FarmerProfile() {
                                             text-center
                                         "
                                     >
+
                                         {item === 1 &&
-                                            (t(
-                                                "personal"
-                                            ) ||
-                                                "Personal")}
+                                            (
+                                                t(
+                                                    "personal"
+                                                ) ||
+                                                "Personal"
+                                            )
+                                        }
+
 
                                         {item === 2 &&
-                                            (t(
-                                                "location"
-                                            ) ||
-                                                "Location")}
+                                            (
+                                                t(
+                                                    "location"
+                                                ) ||
+                                                "Location"
+                                            )
+                                        }
+
 
                                         {item === 3 &&
-                                            (t("farm") ||
-                                                "Farm")}
+                                            (
+                                                t(
+                                                    "farm"
+                                                ) ||
+                                                "Farm"
+                                            )
+                                        }
+
 
                                         {item === 4 &&
-                                            (t(
-                                                "crops"
-                                            ) ||
-                                                "Crops")}
+                                            (
+                                                t(
+                                                    "crops"
+                                                ) ||
+                                                "Crops"
+                                            )
+                                        }
+
                                     </span>
+
                                 </div>
+
                             )
                         )}
+
                     </div>
+
 
                     <div
                         className="
@@ -10117,12 +13058,15 @@ export default function FarmerProfile() {
                             overflow-hidden
                         "
                     >
+
                         <motion.div
                             animate={{
-                                width: `${step * 25}%`
+                                width:
+                                    `${step * 25}%`
                             }}
                             transition={{
-                                duration: 0.3
+                                duration:
+                                    0.3
                             }}
                             className="
                                 bg-[#087443]
@@ -10130,8 +13074,11 @@ export default function FarmerProfile() {
                                 rounded-full
                             "
                         />
+
                     </div>
+
                 </div>
+
 
                 {/* =================================================
                    FORM CONTENT
@@ -10144,11 +13091,13 @@ export default function FarmerProfile() {
                         py-8
                     "
                 >
+
                     {/* =================================================
                        STEP 1 — PERSONAL
                     ================================================= */}
 
                     {step === 1 && (
+
                         <motion.div
                             initial={{
                                 opacity: 0,
@@ -10160,7 +13109,9 @@ export default function FarmerProfile() {
                             }}
                             className="space-y-7"
                         >
+
                             <div>
+
                                 <h2
                                     className="
                                         text-2xl
@@ -10169,11 +13120,16 @@ export default function FarmerProfile() {
                                         text-[#172c25]
                                     "
                                 >
-                                    {t(
-                                        "personal_information"
-                                    ) ||
-                                        "Personal Information"}
+
+                                    {
+                                        t(
+                                            "personal_information"
+                                        ) ||
+                                        "Personal Information"
+                                    }
+
                                 </h2>
+
 
                                 <p
                                     className="
@@ -10181,12 +13137,18 @@ export default function FarmerProfile() {
                                         mt-2
                                     "
                                 >
-                                    {t(
-                                        "tell_about_yourself"
-                                    ) ||
-                                        "Tell us a little about yourself."}
+
+                                    {
+                                        t(
+                                            "tell_about_yourself"
+                                        ) ||
+                                        "Tell us a little about yourself."
+                                    }
+
                                 </p>
+
                             </div>
+
 
                             <div
                                 className="
@@ -10195,9 +13157,11 @@ export default function FarmerProfile() {
                                     gap-5
                                 "
                             >
+
                                 {/* FULL NAME */}
 
                                 <div>
+
                                     <label
                                         className={`
                                             ${labelClass}
@@ -10206,20 +13170,29 @@ export default function FarmerProfile() {
                                             gap-2
                                         `}
                                     >
+
                                         <User
                                             size={17}
                                             className="text-[#087443]"
                                         />
 
-                                        {t(
-                                            "full_name"
-                                        ) ||
-                                            "Full Name"}
 
-                                        <span className="text-red-500">
+                                        {
+                                            t(
+                                                "full_name"
+                                            ) ||
+                                            "Full Name"
+                                        }
+
+
+                                        <span
+                                            className="text-red-500"
+                                        >
                                             *
                                         </span>
+
                                     </label>
+
 
                                     <input
                                         type="text"
@@ -10240,11 +13213,14 @@ export default function FarmerProfile() {
                                             inputClass
                                         }
                                     />
+
                                 </div>
+
 
                                 {/* MOBILE */}
 
                                 <div>
+
                                     <label
                                         className={`
                                             ${labelClass}
@@ -10253,20 +13229,29 @@ export default function FarmerProfile() {
                                             gap-2
                                         `}
                                     >
+
                                         <Phone
                                             size={17}
                                             className="text-[#087443]"
                                         />
 
-                                        {t(
-                                            "mobile_number"
-                                        ) ||
-                                            "Mobile Number"}
 
-                                        <span className="text-red-500">
+                                        {
+                                            t(
+                                                "mobile_number"
+                                            ) ||
+                                            "Mobile Number"
+                                        }
+
+
+                                        <span
+                                            className="text-red-500"
+                                        >
                                             *
                                         </span>
+
                                     </label>
+
 
                                     <input
                                         type="tel"
@@ -10282,19 +13267,29 @@ export default function FarmerProfile() {
                                             inputClass
                                         }
                                     />
+
                                 </div>
+
 
                                 {/* GENDER */}
 
                                 <div>
+
                                     <label
                                         className={
                                             labelClass
                                         }
                                     >
-                                        {t("gender") ||
-                                            "Gender"}
+
+                                        {
+                                            t(
+                                                "gender"
+                                            ) ||
+                                            "Gender"
+                                        }
+
                                     </label>
+
 
                                     <select
                                         name="gender"
@@ -10308,33 +13303,63 @@ export default function FarmerProfile() {
                                             inputClass
                                         }
                                     >
+
                                         <option value="">
-                                            {t(
-                                                "select_gender"
-                                            ) ||
-                                                "Select Gender"}
+
+                                            {
+                                                t(
+                                                    "select_gender"
+                                                ) ||
+                                                "Select Gender"
+                                            }
+
                                         </option>
+
 
                                         <option value="Male">
-                                            {t("male") ||
-                                                "Male"}
+
+                                            {
+                                                t(
+                                                    "male"
+                                                ) ||
+                                                "Male"
+                                            }
+
                                         </option>
+
 
                                         <option value="Female">
-                                            {t("female") ||
-                                                "Female"}
+
+                                            {
+                                                t(
+                                                    "female"
+                                                ) ||
+                                                "Female"
+                                            }
+
                                         </option>
 
+
                                         <option value="Other">
-                                            {t("other") ||
-                                                "Other"}
+
+                                            {
+                                                t(
+                                                    "other"
+                                                ) ||
+                                                "Other"
+                                            }
+
                                         </option>
+
                                     </select>
+
                                 </div>
+
 
                                 {/* AGE */}
 
                                 <div>
+
                                     <label
                                         className={`
                                             ${labelClass}
@@ -10343,14 +13368,22 @@ export default function FarmerProfile() {
                                             gap-2
                                         `}
                                     >
+
                                         <Calendar
                                             size={17}
                                             className="text-[#087443]"
                                         />
 
-                                        {t("age") ||
-                                            "Age"}
+
+                                        {
+                                            t(
+                                                "age"
+                                            ) ||
+                                            "Age"
+                                        }
+
                                     </label>
+
 
                                     <input
                                         type="number"
@@ -10366,8 +13399,11 @@ export default function FarmerProfile() {
                                             inputClass
                                         }
                                     />
+
                                 </div>
+
                             </div>
+
 
                             {/* IDENTITY CARD */}
 
@@ -10383,6 +13419,7 @@ export default function FarmerProfile() {
                                     gap-4
                                 "
                             >
+
                                 <div
                                     className="
                                         w-12
@@ -10397,24 +13434,33 @@ export default function FarmerProfile() {
                                         shrink-0
                                     "
                                 >
+
                                     <User
                                         size={22}
                                         className="text-[#087443]"
                                     />
+
                                 </div>
 
+
                                 <div>
+
                                     <h3
                                         className="
                                             font-bold
                                             text-gray-800
                                         "
                                     >
-                                        {t(
-                                            "farmxpert_identity"
-                                        ) ||
-                                            "Your FarmXpert Profile"}
+
+                                        {
+                                            t(
+                                                "farmxpert_identity"
+                                            ) ||
+                                            "Your FarmXpert Profile"
+                                        }
+
                                     </h3>
+
 
                                     <p
                                         className="
@@ -10423,21 +13469,31 @@ export default function FarmerProfile() {
                                             mt-1
                                         "
                                     >
-                                        {t(
-                                            "identity_description"
-                                        ) ||
-                                            "This information helps personalize your farming experience."}
+
+                                        {
+                                            t(
+                                                "identity_description"
+                                            ) ||
+                                            "This information helps personalize your farming experience."
+                                        }
+
                                     </p>
+
                                 </div>
+
                             </div>
+
                         </motion.div>
+
                     )}
+
 
                     {/* =================================================
                        STEP 2 — LOCATION
                     ================================================= */}
 
                     {step === 2 && (
+
                         <motion.div
                             initial={{
                                 opacity: 0,
@@ -10449,7 +13505,9 @@ export default function FarmerProfile() {
                             }}
                             className="space-y-7"
                         >
+
                             <div>
+
                                 <h2
                                     className="
                                         text-2xl
@@ -10458,11 +13516,16 @@ export default function FarmerProfile() {
                                         text-[#172c25]
                                     "
                                 >
-                                    {t(
-                                        "farm_location"
-                                    ) ||
-                                        "Farm Location"}
+
+                                    {
+                                        t(
+                                            "farm_location"
+                                        ) ||
+                                        "Farm Location"
+                                    }
+
                                 </h2>
+
 
                                 <p
                                     className="
@@ -10470,12 +13533,18 @@ export default function FarmerProfile() {
                                         mt-2
                                     "
                                 >
-                                    {t(
-                                        "farm_location_desc"
-                                    ) ||
-                                        "Tell us where your farm is located."}
+
+                                    {
+                                        t(
+                                            "farm_location_desc"
+                                        ) ||
+                                        "Tell us where your farm is located."
+                                    }
+
                                 </p>
+
                             </div>
+
 
                             <div
                                 className="
@@ -10484,21 +13553,32 @@ export default function FarmerProfile() {
                                     gap-5
                                 "
                             >
+
                                 {/* STATE */}
 
                                 <div>
+
                                     <label
                                         className={
                                             labelClass
                                         }
                                     >
-                                        {t("state") ||
-                                            "State"}
 
-                                        <span className="text-red-500 ml-1">
+                                        {
+                                            t(
+                                                "state"
+                                            ) ||
+                                            "State"
+                                        }
+
+                                        <span
+                                            className="text-red-500 ml-1"
+                                        >
                                             *
                                         </span>
+
                                     </label>
+
 
                                     <input
                                         type="text"
@@ -10514,25 +13594,35 @@ export default function FarmerProfile() {
                                             inputClass
                                         }
                                     />
+
                                 </div>
+
 
                                 {/* DISTRICT */}
 
                                 <div>
+
                                     <label
                                         className={
                                             labelClass
                                         }
                                     >
-                                        {t(
-                                            "district"
-                                        ) ||
-                                            "District"}
 
-                                        <span className="text-red-500 ml-1">
+                                        {
+                                            t(
+                                                "district"
+                                            ) ||
+                                            "District"
+                                        }
+
+                                        <span
+                                            className="text-red-500 ml-1"
+                                        >
                                             *
                                         </span>
+
                                     </label>
+
 
                                     <input
                                         type="text"
@@ -10548,21 +13638,29 @@ export default function FarmerProfile() {
                                             inputClass
                                         }
                                     />
+
                                 </div>
+
 
                                 {/* VILLAGE */}
 
                                 <div>
+
                                     <label
                                         className={
                                             labelClass
                                         }
                                     >
-                                        {t(
-                                            "village"
-                                        ) ||
-                                            "Village"}
+
+                                        {
+                                            t(
+                                                "village"
+                                            ) ||
+                                            "Village"
+                                        }
+
                                     </label>
+
 
                                     <input
                                         type="text"
@@ -10583,21 +13681,29 @@ export default function FarmerProfile() {
                                             inputClass
                                         }
                                     />
+
                                 </div>
+
 
                                 {/* PIN CODE */}
 
                                 <div>
+
                                     <label
                                         className={
                                             labelClass
                                         }
                                     >
-                                        {t(
-                                            "pin_code"
-                                        ) ||
-                                            "PIN Code"}
+
+                                        {
+                                            t(
+                                                "pin_code"
+                                            ) ||
+                                            "PIN Code"
+                                        }
+
                                     </label>
+
 
                                     <input
                                         type="text"
@@ -10613,8 +13719,11 @@ export default function FarmerProfile() {
                                             inputClass
                                         }
                                     />
+
                                 </div>
+
                             </div>
+
 
                             {/* GPS LOCATION */}
 
@@ -10627,6 +13736,7 @@ export default function FarmerProfile() {
                                     p-5
                                 "
                             >
+
                                 <div
                                     className="
                                         flex
@@ -10637,6 +13747,7 @@ export default function FarmerProfile() {
                                         gap-5
                                     "
                                 >
+
                                     <div
                                         className="
                                             flex
@@ -10644,6 +13755,7 @@ export default function FarmerProfile() {
                                             gap-4
                                         "
                                     >
+
                                         <div
                                             className="
                                                 w-12
@@ -10657,24 +13769,33 @@ export default function FarmerProfile() {
                                                 justify-center
                                             "
                                         >
+
                                             <MapPin
                                                 size={22}
                                                 className="text-[#345064]"
                                             />
+
                                         </div>
 
+
                                         <div>
+
                                             <h3
                                                 className="
                                                     font-bold
                                                     text-[#345064]
                                                 "
                                             >
-                                                {t(
-                                                    "gps_location"
-                                                ) ||
-                                                    "GPS Location"}
+
+                                                {
+                                                    t(
+                                                        "gps_location"
+                                                    ) ||
+                                                    "GPS Location"
+                                                }
+
                                             </h3>
+
 
                                             <p
                                                 className="
@@ -10684,13 +13805,20 @@ export default function FarmerProfile() {
                                                     max-w-xl
                                                 "
                                             >
-                                                {t(
-                                                    "gps_description"
-                                                ) ||
-                                                    "Use your current location to automatically detect your farm coordinates."}
+
+                                                {
+                                                    t(
+                                                        "gps_description"
+                                                    ) ||
+                                                    "Use your current location to automatically detect your farm coordinates."
+                                                }
+
                                             </p>
+
                                         </div>
+
                                     </div>
+
 
                                     <button
                                         type="button"
@@ -10716,70 +13844,109 @@ export default function FarmerProfile() {
                                             disabled:opacity-50
                                         "
                                     >
+
                                         <MapPin
                                             size={17}
                                         />
 
-                                        {t(
-                                            "detect_location"
-                                        ) ||
-                                            "Detect Location"}
+
+                                        {
+                                            t(
+                                                "detect_location"
+                                            ) ||
+                                            "Detect Location"
+                                        }
+
                                     </button>
+
                                 </div>
 
-                                {(profile.latitude ||
-                                    profile.longitude) && (
-                                    <div
-                                        className="
-                                            mt-5
-                                            pt-4
-                                            border-t
-                                            border-gray-200
-                                            grid
-                                            md:grid-cols-2
-                                            gap-3
-                                            text-sm
-                                            text-gray-600
-                                        "
-                                    >
-                                        <div>
-                                            {t(
-                                                "latitude"
-                                            ) ||
-                                                "Latitude"}
-                                            :
 
-                                            <strong className="ml-1">
+                                {
+                                    (
+                                        profile.latitude ||
+                                        profile.longitude
+                                    ) && (
+
+                                        <div
+                                            className="
+                                                mt-5
+                                                pt-4
+                                                border-t
+                                                border-gray-200
+                                                grid
+                                                md:grid-cols-2
+                                                gap-3
+                                                text-sm
+                                                text-gray-600
+                                            "
+                                        >
+
+                                            <div>
+
                                                 {
-                                                    profile.latitude
+                                                    t(
+                                                        "latitude"
+                                                    ) ||
+                                                    "Latitude"
                                                 }
-                                            </strong>
+                                                :
+
+
+                                                <strong
+                                                    className="ml-1"
+                                                >
+
+                                                    {
+                                                        profile.latitude
+                                                    }
+
+                                                </strong>
+
+                                            </div>
+
+
+                                            <div>
+
+                                                {
+                                                    t(
+                                                        "longitude"
+                                                    ) ||
+                                                    "Longitude"
+                                                }
+                                                :
+
+
+                                                <strong
+                                                    className="ml-1"
+                                                >
+
+                                                    {
+                                                        profile.longitude
+                                                    }
+
+                                                </strong>
+
+                                            </div>
+
                                         </div>
 
-                                        <div>
-                                            {t(
-                                                "longitude"
-                                            ) ||
-                                                "Longitude"}
-                                            :
+                                    )
+                                }
 
-                                            <strong className="ml-1">
-                                                {
-                                                    profile.longitude
-                                                }
-                                            </strong>
-                                        </div>
-                                    </div>
-                                )}
                             </div>
+
                         </motion.div>
+
                     )}
+
 
                     {/* =================================================
                        STEP 3 — FARM
                     ================================================= */}
 
                     {step === 3 && (
+
                         <motion.div
                             initial={{
                                 opacity: 0,
@@ -10791,7 +13958,9 @@ export default function FarmerProfile() {
                             }}
                             className="space-y-7"
                         >
+
                             <div>
+
                                 <h2
                                     className="
                                         text-2xl
@@ -10800,11 +13969,16 @@ export default function FarmerProfile() {
                                         text-[#172c25]
                                     "
                                 >
-                                    {t(
-                                        "farm_information"
-                                    ) ||
-                                        "Farm Information"}
+
+                                    {
+                                        t(
+                                            "farm_information"
+                                        ) ||
+                                        "Farm Information"
+                                    }
+
                                 </h2>
+
 
                                 <p
                                     className="
@@ -10812,12 +13986,18 @@ export default function FarmerProfile() {
                                         mt-2
                                     "
                                 >
-                                    {t(
-                                        "farm_information_desc"
-                                    ) ||
-                                        "Tell us about your farm."}
+
+                                    {
+                                        t(
+                                            "farm_information_desc"
+                                        ) ||
+                                        "Tell us about your farm."
+                                    }
+
                                 </p>
+
                             </div>
+
 
                             <div
                                 className="
@@ -10826,9 +14006,11 @@ export default function FarmerProfile() {
                                     gap-5
                                 "
                             >
+
                                 {/* FARM NAME */}
 
                                 <div>
+
                                     <label
                                         className={`
                                             ${labelClass}
@@ -10837,20 +14019,29 @@ export default function FarmerProfile() {
                                             gap-2
                                         `}
                                     >
+
                                         <Tractor
                                             size={17}
                                             className="text-[#087443]"
                                         />
 
-                                        {t(
-                                            "farm_name"
-                                        ) ||
-                                            "Farm Name"}
 
-                                        <span className="text-red-500">
+                                        {
+                                            t(
+                                                "farm_name"
+                                            ) ||
+                                            "Farm Name"
+                                        }
+
+
+                                        <span
+                                            className="text-red-500"
+                                        >
                                             *
                                         </span>
+
                                     </label>
+
 
                                     <input
                                         type="text"
@@ -10866,23 +14057,37 @@ export default function FarmerProfile() {
                                             inputClass
                                         }
                                     />
+
                                 </div>
+
 
                                 {/* TOTAL LAND */}
 
                                 <div>
+
                                     <label
                                         className={
                                             labelClass
                                         }
                                     >
-                                        {t(
-                                            "total_land"
-                                        ) ||
-                                            "Total Land"}
+
+                                        {
+                                            t(
+                                                "total_land"
+                                            ) ||
+                                            "Total Land"
+                                        }
+
                                     </label>
 
-                                    <div className="flex gap-2">
+
+                                    <div
+                                        className="
+                                            flex
+                                            gap-2
+                                        "
+                                    >
+
                                         <input
                                             type="number"
                                             name="landArea"
@@ -10900,6 +14105,7 @@ export default function FarmerProfile() {
                                             }
                                         />
 
+
                                         <select
                                             name="landUnit"
                                             value={
@@ -10913,26 +14119,45 @@ export default function FarmerProfile() {
                                                 max-w-[145px]
                                             `}
                                         >
-                                            <option value="Acres">
-                                                {t(
-                                                    "acres"
-                                                ) ||
-                                                    "Acres"}
+
+                                            <option
+                                                value="Acres"
+                                            >
+
+                                                {
+                                                    t(
+                                                        "acres"
+                                                    ) ||
+                                                    "Acres"
+                                                }
+
                                             </option>
 
-                                            <option value="Hectares">
-                                                {t(
-                                                    "hectares"
-                                                ) ||
-                                                    "Hectares"}
+
+                                            <option
+                                                value="Hectares"
+                                            >
+
+                                                {
+                                                    t(
+                                                        "hectares"
+                                                    ) ||
+                                                    "Hectares"
+                                                }
+
                                             </option>
+
                                         </select>
+
                                     </div>
+
                                 </div>
+
 
                                 {/* SOIL TYPE */}
 
                                 <div>
+
                                     <label
                                         className={`
                                             ${labelClass}
@@ -10941,16 +14166,22 @@ export default function FarmerProfile() {
                                             gap-2
                                         `}
                                     >
+
                                         <Mountain
                                             size={17}
                                             className="text-[#087443]"
                                         />
 
-                                        {t(
-                                            "soil_type"
-                                        ) ||
-                                            "Soil Type"}
+
+                                        {
+                                            t(
+                                                "soil_type"
+                                            ) ||
+                                            "Soil Type"
+                                        }
+
                                     </label>
+
 
                                     <select
                                         name="soilType"
@@ -10964,60 +14195,111 @@ export default function FarmerProfile() {
                                             inputClass
                                         }
                                     >
+
                                         <option value="">
-                                            {t(
-                                                "select_soil"
-                                            ) ||
-                                                "Select Soil"}
+
+                                            {
+                                                t(
+                                                    "select_soil"
+                                                ) ||
+                                                "Select Soil"
+                                            }
+
                                         </option>
 
-                                        <option value="Black Soil">
-                                            {t(
-                                                "black_soil"
-                                            ) ||
-                                                "Black Soil"}
+
+                                        <option
+                                            value="Black Soil"
+                                        >
+
+                                            {
+                                                t(
+                                                    "black_soil"
+                                                ) ||
+                                                "Black Soil"
+                                            }
+
                                         </option>
 
-                                        <option value="Red Soil">
-                                            {t(
-                                                "red_soil"
-                                            ) ||
-                                                "Red Soil"}
+
+                                        <option
+                                            value="Red Soil"
+                                        >
+
+                                            {
+                                                t(
+                                                    "red_soil"
+                                                ) ||
+                                                "Red Soil"
+                                            }
+
                                         </option>
 
-                                        <option value="Clay Soil">
-                                            {t(
-                                                "clay_soil"
-                                            ) ||
-                                                "Clay Soil"}
+
+                                        <option
+                                            value="Clay Soil"
+                                        >
+
+                                            {
+                                                t(
+                                                    "clay_soil"
+                                                ) ||
+                                                "Clay Soil"
+                                            }
+
                                         </option>
 
-                                        <option value="Alluvial Soil">
-                                            {t(
-                                                "alluvial_soil"
-                                            ) ||
-                                                "Alluvial Soil"}
+
+                                        <option
+                                            value="Alluvial Soil"
+                                        >
+
+                                            {
+                                                t(
+                                                    "alluvial_soil"
+                                                ) ||
+                                                "Alluvial Soil"
+                                            }
+
                                         </option>
 
-                                        <option value="Laterite Soil">
-                                            {t(
-                                                "laterite_soil"
-                                            ) ||
-                                                "Laterite Soil"}
+
+                                        <option
+                                            value="Laterite Soil"
+                                        >
+
+                                            {
+                                                t(
+                                                    "laterite_soil"
+                                                ) ||
+                                                "Laterite Soil"
+                                            }
+
                                         </option>
 
-                                        <option value="Sandy Soil">
-                                            {t(
-                                                "sandy_soil"
-                                            ) ||
-                                                "Sandy Soil"}
+
+                                        <option
+                                            value="Sandy Soil"
+                                        >
+
+                                            {
+                                                t(
+                                                    "sandy_soil"
+                                                ) ||
+                                                "Sandy Soil"
+                                            }
+
                                         </option>
+
                                     </select>
+
                                 </div>
+
 
                                 {/* IRRIGATION */}
 
                                 <div>
+
                                     <label
                                         className={`
                                             ${labelClass}
@@ -11026,16 +14308,22 @@ export default function FarmerProfile() {
                                             gap-2
                                         `}
                                     >
+
                                         <Droplets
                                             size={17}
                                             className="text-[#087443]"
                                         />
 
-                                        {t(
-                                            "irrigation_type"
-                                        ) ||
-                                            "Irrigation Type"}
+
+                                        {
+                                            t(
+                                                "irrigation_type"
+                                            ) ||
+                                            "Irrigation Type"
+                                        }
+
                                     </label>
+
 
                                     <select
                                         name="irrigationType"
@@ -11049,61 +14337,112 @@ export default function FarmerProfile() {
                                             inputClass
                                         }
                                     >
+
                                         <option value="">
-                                            {t(
-                                                "select_irrigation"
-                                            ) ||
-                                                "Select Irrigation"}
+
+                                            {
+                                                t(
+                                                    "select_irrigation"
+                                                ) ||
+                                                "Select Irrigation"
+                                            }
+
                                         </option>
 
-                                        <option value="Drip Irrigation">
-                                            {t(
-                                                "drip_irrigation"
-                                            ) ||
-                                                "Drip Irrigation"}
+
+                                        <option
+                                            value="Drip Irrigation"
+                                        >
+
+                                            {
+                                                t(
+                                                    "drip_irrigation"
+                                                ) ||
+                                                "Drip Irrigation"
+                                            }
+
                                         </option>
 
-                                        <option value="Sprinkler">
-                                            {t(
-                                                "sprinkler"
-                                            ) ||
-                                                "Sprinkler"}
+
+                                        <option
+                                            value="Sprinkler"
+                                        >
+
+                                            {
+                                                t(
+                                                    "sprinkler"
+                                                ) ||
+                                                "Sprinkler"
+                                            }
+
                                         </option>
 
-                                        <option value="Canal">
-                                            {t("canal") ||
-                                                "Canal"}
+
+                                        <option
+                                            value="Canal"
+                                        >
+
+                                            {
+                                                t(
+                                                    "canal"
+                                                ) ||
+                                                "Canal"
+                                            }
+
                                         </option>
 
-                                        <option value="Rainfed">
-                                            {t(
-                                                "rainfed"
-                                            ) ||
-                                                "Rainfed"}
+
+                                        <option
+                                            value="Rainfed"
+                                        >
+
+                                            {
+                                                t(
+                                                    "rainfed"
+                                                ) ||
+                                                "Rainfed"
+                                            }
+
                                         </option>
 
-                                        <option value="Borewell">
-                                            {t(
-                                                "borewell"
-                                            ) ||
-                                                "Borewell"}
+
+                                        <option
+                                            value="Borewell"
+                                        >
+
+                                            {
+                                                t(
+                                                    "borewell"
+                                                ) ||
+                                                "Borewell"
+                                            }
+
                                         </option>
+
                                     </select>
+
                                 </div>
+
 
                                 {/* WATER SOURCE */}
 
                                 <div>
+
                                     <label
                                         className={
                                             labelClass
                                         }
                                     >
-                                        {t(
-                                            "water_source"
-                                        ) ||
-                                            "Water Source"}
+
+                                        {
+                                            t(
+                                                "water_source"
+                                            ) ||
+                                            "Water Source"
+                                        }
+
                                     </label>
+
 
                                     <select
                                         name="waterSource"
@@ -11117,52 +14456,105 @@ export default function FarmerProfile() {
                                             inputClass
                                         }
                                     >
+
                                         <option value="">
-                                            {t(
-                                                "select_water_source"
-                                            ) ||
-                                                "Select Water Source"}
+
+                                            {
+                                                t(
+                                                    "select_water_source"
+                                                ) ||
+                                                "Select Water Source"
+                                            }
+
                                         </option>
 
-                                        <option value="Borewell">
-                                            {t(
-                                                "borewell"
-                                            ) ||
-                                                "Borewell"}
+
+                                        <option
+                                            value="Borewell"
+                                        >
+
+                                            {
+                                                t(
+                                                    "borewell"
+                                                ) ||
+                                                "Borewell"
+                                            }
+
                                         </option>
 
-                                        <option value="River">
-                                            {t("river") ||
-                                                "River"}
+
+                                        <option
+                                            value="River"
+                                        >
+
+                                            {
+                                                t(
+                                                    "river"
+                                                ) ||
+                                                "River"
+                                            }
+
                                         </option>
 
-                                        <option value="Canal">
-                                            {t("canal") ||
-                                                "Canal"}
+
+                                        <option
+                                            value="Canal"
+                                        >
+
+                                            {
+                                                t(
+                                                    "canal"
+                                                ) ||
+                                                "Canal"
+                                            }
+
                                         </option>
 
-                                        <option value="Pond">
-                                            {t("pond") ||
-                                                "Pond"}
+
+                                        <option
+                                            value="Pond"
+                                        >
+
+                                            {
+                                                t(
+                                                    "pond"
+                                                ) ||
+                                                "Pond"
+                                            }
+
                                         </option>
 
-                                        <option value="Rain Water">
-                                            {t(
-                                                "rain_water"
-                                            ) ||
-                                                "Rain Water"}
+
+                                        <option
+                                            value="Rain Water"
+                                        >
+
+                                            {
+                                                t(
+                                                    "rain_water"
+                                                ) ||
+                                                "Rain Water"
+                                            }
+
                                         </option>
+
                                     </select>
+
                                 </div>
+
                             </div>
+
                         </motion.div>
+
                     )}
+
 
                     {/* =================================================
                        STEP 4 — CROPS
                     ================================================= */}
 
                     {step === 4 && (
+
                         <motion.div
                             initial={{
                                 opacity: 0,
@@ -11174,7 +14566,9 @@ export default function FarmerProfile() {
                             }}
                             className="space-y-7"
                         >
+
                             <div>
+
                                 <h2
                                     className="
                                         text-2xl
@@ -11183,11 +14577,16 @@ export default function FarmerProfile() {
                                         text-[#172c25]
                                     "
                                 >
-                                    {t(
-                                        "crop_information"
-                                    ) ||
-                                        "Crop Information"}
+
+                                    {
+                                        t(
+                                            "crop_information"
+                                        ) ||
+                                        "Crop Information"
+                                    }
+
                                 </h2>
+
 
                                 <p
                                     className="
@@ -11195,12 +14594,18 @@ export default function FarmerProfile() {
                                         mt-2
                                     "
                                 >
-                                    {t(
-                                        "crop_information_desc"
-                                    ) ||
-                                        "Tell us about the crops you grow."}
+
+                                    {
+                                        t(
+                                            "crop_information_desc"
+                                        ) ||
+                                        "Tell us about the crops you grow."
+                                    }
+
                                 </p>
+
                             </div>
+
 
                             <div
                                 className="
@@ -11209,9 +14614,11 @@ export default function FarmerProfile() {
                                     gap-5
                                 "
                             >
+
                                 {/* PRIMARY CROP */}
 
                                 <div>
+
                                     <label
                                         className={`
                                             ${labelClass}
@@ -11220,20 +14627,29 @@ export default function FarmerProfile() {
                                             gap-2
                                         `}
                                     >
+
                                         <Sprout
                                             size={17}
                                             className="text-[#087443]"
                                         />
 
-                                        {t(
-                                            "primary_crop"
-                                        ) ||
-                                            "Primary Crop"}
 
-                                        <span className="text-red-500">
+                                        {
+                                            t(
+                                                "primary_crop"
+                                            ) ||
+                                            "Primary Crop"
+                                        }
+
+
+                                        <span
+                                            className="text-red-500"
+                                        >
                                             *
                                         </span>
+
                                     </label>
+
 
                                     <select
                                         name="primaryCrop"
@@ -11247,85 +14663,142 @@ export default function FarmerProfile() {
                                             inputClass
                                         }
                                     >
+
                                         <option value="">
-                                            {t(
-                                                "select_crop"
-                                            ) ||
-                                                "Select Crop"}
+
+                                            {
+                                                t(
+                                                    "select_crop"
+                                                ) ||
+                                                "Select Crop"
+                                            }
+
                                         </option>
+
 
                                         <option value="Rice">
-                                            {t("rice") ||
-                                                "Rice"}
+
+                                            {
+                                                t("rice") ||
+                                                "Rice"
+                                            }
+
                                         </option>
+
 
                                         <option value="Maize">
-                                            {t("maize") ||
-                                                "Maize"}
+
+                                            {
+                                                t("maize") ||
+                                                "Maize"
+                                            }
+
                                         </option>
+
 
                                         <option value="Cotton">
-                                            {t(
-                                                "cotton"
-                                            ) ||
-                                                "Cotton"}
+
+                                            {
+                                                t("cotton") ||
+                                                "Cotton"
+                                            }
+
                                         </option>
+
 
                                         <option value="Groundnut">
-                                            {t(
-                                                "groundnut"
-                                            ) ||
-                                                "Groundnut"}
+
+                                            {
+                                                t(
+                                                    "groundnut"
+                                                ) ||
+                                                "Groundnut"
+                                            }
+
                                         </option>
+
 
                                         <option value="Sugarcane">
-                                            {t(
-                                                "sugarcane"
-                                            ) ||
-                                                "Sugarcane"}
+
+                                            {
+                                                t(
+                                                    "sugarcane"
+                                                ) ||
+                                                "Sugarcane"
+                                            }
+
                                         </option>
+
 
                                         <option value="Tomato">
-                                            {t(
-                                                "tomato"
-                                            ) ||
-                                                "Tomato"}
+
+                                            {
+                                                t(
+                                                    "tomato"
+                                                ) ||
+                                                "Tomato"
+                                            }
+
                                         </option>
+
 
                                         <option value="Potato">
-                                            {t(
-                                                "potato"
-                                            ) ||
-                                                "Potato"}
+
+                                            {
+                                                t(
+                                                    "potato"
+                                                ) ||
+                                                "Potato"
+                                            }
+
                                         </option>
+
 
                                         <option value="Chilli">
-                                            {t(
-                                                "chilli"
-                                            ) ||
-                                                "Chilli"}
+
+                                            {
+                                                t(
+                                                    "chilli"
+                                                ) ||
+                                                "Chilli"
+                                            }
+
                                         </option>
 
+
                                         <option value="Wheat">
-                                            {t("wheat") ||
-                                                "Wheat"}
+
+                                            {
+                                                t("wheat") ||
+                                                "Wheat"
+                                            }
+
                                         </option>
+
                                     </select>
+
                                 </div>
+
 
                                 {/* SECONDARY CROP */}
 
                                 <div>
+
                                     <label
                                         className={
                                             labelClass
                                         }
                                     >
-                                        {t(
-                                            "secondary_crop"
-                                        ) ||
-                                            "Secondary Crop"}
+
+                                        {
+                                            t(
+                                                "secondary_crop"
+                                            ) ||
+                                            "Secondary Crop"
+                                        }
+
                                     </label>
+
 
                                     <input
                                         type="text"
@@ -11346,21 +14819,29 @@ export default function FarmerProfile() {
                                             inputClass
                                         }
                                     />
+
                                 </div>
+
 
                                 {/* FARMING TYPE */}
 
                                 <div>
+
                                     <label
                                         className={
                                             labelClass
                                         }
                                     >
-                                        {t(
-                                            "farming_type"
-                                        ) ||
-                                            "Farming Type"}
+
+                                        {
+                                            t(
+                                                "farming_type"
+                                            ) ||
+                                            "Farming Type"
+                                        }
+
                                     </label>
+
 
                                     <select
                                         name="farmingType"
@@ -11374,47 +14855,82 @@ export default function FarmerProfile() {
                                             inputClass
                                         }
                                     >
+
                                         <option value="">
-                                            {t(
-                                                "select_farming_type"
-                                            ) ||
-                                                "Select Farming Type"}
+
+                                            {
+                                                t(
+                                                    "select_farming_type"
+                                                ) ||
+                                                "Select Farming Type"
+                                            }
+
                                         </option>
 
-                                        <option value="Organic">
-                                            {t(
-                                                "organic"
-                                            ) ||
-                                                "Organic"}
+
+                                        <option
+                                            value="Organic"
+                                        >
+
+                                            {
+                                                t(
+                                                    "organic"
+                                                ) ||
+                                                "Organic"
+                                            }
+
                                         </option>
 
-                                        <option value="Conventional">
-                                            {t(
-                                                "conventional"
-                                            ) ||
-                                                "Conventional"}
+
+                                        <option
+                                            value="Conventional"
+                                        >
+
+                                            {
+                                                t(
+                                                    "conventional"
+                                                ) ||
+                                                "Conventional"
+                                            }
+
                                         </option>
 
-                                        <option value="Mixed">
-                                            {t("mixed") ||
-                                                "Mixed"}
+
+                                        <option
+                                            value="Mixed"
+                                        >
+
+                                            {
+                                                t("mixed") ||
+                                                "Mixed"
+                                            }
+
                                         </option>
+
                                     </select>
+
                                 </div>
+
 
                                 {/* EXPERIENCE */}
 
                                 <div>
+
                                     <label
                                         className={
                                             labelClass
                                         }
                                     >
-                                        {t(
-                                            "farming_experience"
-                                        ) ||
-                                            "Farming Experience"}
+
+                                        {
+                                            t(
+                                                "farming_experience"
+                                            ) ||
+                                            "Farming Experience"
+                                        }
+
                                     </label>
+
 
                                     <input
                                         type="number"
@@ -11431,21 +14947,33 @@ export default function FarmerProfile() {
                                             inputClass
                                         }
                                     />
+
                                 </div>
+
 
                                 {/* LIVESTOCK */}
 
-                                <div className="md:col-span-2">
+                                <div
+                                    className="
+                                        md:col-span-2
+                                    "
+                                >
+
                                     <label
                                         className={
                                             labelClass
                                         }
                                     >
-                                        {t(
-                                            "livestock"
-                                        ) ||
-                                            "Livestock"}
+
+                                        {
+                                            t(
+                                                "livestock"
+                                            ) ||
+                                            "Livestock"
+                                        }
+
                                     </label>
+
 
                                     <input
                                         type="text"
@@ -11466,8 +14994,11 @@ export default function FarmerProfile() {
                                             inputClass
                                         }
                                     />
+
                                 </div>
+
                             </div>
+
 
                             {/* ALMOST DONE CARD */}
 
@@ -11480,6 +15011,7 @@ export default function FarmerProfile() {
                                     p-5
                                 "
                             >
+
                                 <div
                                     className="
                                         flex
@@ -11487,6 +15019,7 @@ export default function FarmerProfile() {
                                         gap-4
                                     "
                                 >
+
                                     <div
                                         className="
                                             w-12
@@ -11501,13 +15034,17 @@ export default function FarmerProfile() {
                                             border-[#d8eee1]
                                         "
                                     >
+
                                         <CheckCircle
                                             size={23}
                                             className="text-[#087443]"
                                         />
+
                                     </div>
 
+
                                     <div>
+
                                         <h3
                                             className="
                                                 font-bold
@@ -11515,11 +15052,16 @@ export default function FarmerProfile() {
                                                 text-lg
                                             "
                                         >
-                                            {t(
-                                                "almost_done"
-                                            ) ||
-                                                "Almost Done"}
+
+                                            {
+                                                t(
+                                                    "almost_done"
+                                                ) ||
+                                                "Almost Done"
+                                            }
+
                                         </h3>
+
 
                                         <p
                                             className="
@@ -11527,16 +15069,26 @@ export default function FarmerProfile() {
                                                 mt-1.5
                                             "
                                         >
-                                            {t(
-                                                "almost_done_desc"
-                                            ) ||
-                                                "Save your profile to personalize your FarmXpert dashboard."}
+
+                                            {
+                                                t(
+                                                    "almost_done_desc"
+                                                ) ||
+                                                "Save your profile to personalize your FarmXpert dashboard."
+                                            }
+
                                         </p>
+
                                     </div>
+
                                 </div>
+
                             </div>
+
                         </motion.div>
+
                     )}
+
 
                     {/* =================================================
                        NAVIGATION
@@ -11550,6 +15102,7 @@ export default function FarmerProfile() {
                             border-gray-100
                         "
                     >
+
                         <div
                             className="
                                 flex
@@ -11560,6 +15113,7 @@ export default function FarmerProfile() {
                                 gap-4
                             "
                         >
+
                             {/* LEFT */}
 
                             <div
@@ -11569,9 +15123,11 @@ export default function FarmerProfile() {
                                     gap-3
                                 "
                             >
+
                                 {/* PREVIOUS */}
 
                                 {step > 1 ? (
+
                                     <button
                                         type="button"
                                         onClick={
@@ -11597,18 +15153,27 @@ export default function FarmerProfile() {
                                             disabled:opacity-50
                                         "
                                     >
+
                                         <ArrowLeft
                                             size={17}
                                         />
 
-                                        {t(
-                                            "previous"
-                                        ) ||
-                                            "Previous"}
+
+                                        {
+                                            t(
+                                                "previous"
+                                            ) ||
+                                            "Previous"
+                                        }
+
                                     </button>
+
                                 ) : (
+
                                     <div />
+
                                 )}
+
 
                                 {/* SKIP */}
 
@@ -11632,16 +15197,23 @@ export default function FarmerProfile() {
                                         disabled:opacity-50
                                     "
                                 >
-                                    {t(
-                                        "skip_for_now"
-                                    ) ||
-                                        "Skip for now"}
+
+                                    {
+                                        t(
+                                            "skip_for_now"
+                                        ) ||
+                                        "Skip for now"
+                                    }
+
                                 </button>
+
                             </div>
+
 
                             {/* RIGHT */}
 
                             {step < totalSteps ? (
+
                                 <button
                                     type="button"
                                     onClick={
@@ -11668,14 +15240,21 @@ export default function FarmerProfile() {
                                         disabled:opacity-50
                                     "
                                 >
-                                    {t("next") ||
-                                        "Next"}
+
+                                    {
+                                        t("next") ||
+                                        "Next"
+                                    }
+
 
                                     <ArrowRight
                                         size={18}
                                     />
+
                                 </button>
+
                             ) : (
+
                                 <button
                                     type="button"
                                     onClick={
@@ -11703,8 +15282,11 @@ export default function FarmerProfile() {
                                         disabled:cursor-not-allowed
                                     "
                                 >
+
                                     {loading ? (
+
                                         <>
+
                                             <Loader2
                                                 size={18}
                                                 className="
@@ -11712,27 +15294,44 @@ export default function FarmerProfile() {
                                                 "
                                             />
 
-                                            {t(
-                                                "saving"
-                                            ) ||
-                                                "Saving..."}
+
+                                            {
+                                                t(
+                                                    "saving"
+                                                ) ||
+                                                "Saving..."
+                                            }
+
                                         </>
+
                                     ) : (
+
                                         <>
-                                            {t(
-                                                "save_profile"
-                                            ) ||
-                                                "Save Profile"}
+
+                                            {
+                                                t(
+                                                    "save_profile"
+                                                ) ||
+                                                "Save Profile"
+                                            }
+
 
                                             <CheckCircle
                                                 size={18}
                                             />
+
                                         </>
+
                                     )}
+
                                 </button>
+
                             )}
+
                         </div>
+
                     </div>
+
 
                     {/* =================================================
                        FOOTER
@@ -11744,6 +15343,7 @@ export default function FarmerProfile() {
                             text-center
                         "
                     >
+
                         <p
                             className="
                                 text-xs
@@ -11751,14 +15351,24 @@ export default function FarmerProfile() {
                                 text-gray-400
                             "
                         >
-                            {t(
-                                "profile_footer"
-                            ) ||
-                                "You can update these details anytime from My Profile."}
+
+                            {
+                                t(
+                                    "profile_footer"
+                                ) ||
+                                "You can update these details anytime from My Profile."
+                            }
+
                         </p>
+
                     </div>
+
                 </div>
+
             </motion.div>
+
         </div>
+
     );
+
 }
